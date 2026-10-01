@@ -1128,9 +1128,14 @@ async function startScanner() {
         const student = S.students.find(function(s) { return s.id === sid; });
         if (!student) { showToast('QR tidak dikenal: ' + decodedText, 'error'); return; }
         playDing();
-        if (S.selectedStudents.indexOf(sid) === -1) S.selectedStudents.push(sid);
-        api('savePointsMulti', [sid], [{ ruleId: getKehadiranRuleId(), multiplier: 1 }]).then(function(res) {
-          showToast('✅ ' + student.name + ' +' + res.totalPoints + ' poin', 'success');
+        
+        api('scanQRAttendance', sid).then(function(res) {
+          if (res.sudahAbsen) {
+            showToast('⚠️ ' + res.studentName + ' sudah absen hari ini. Poin tidak ditambah.', 'warn');
+          } else {
+            playConfetti();
+            showToast('✅ ' + res.studentName + ' HADIR +' + res.poinDitambah + ' poin', 'success');
+          }
           loadData();
         }).catch(function(err) { showToast('Gagal: ' + err.message, 'error'); });
       },
@@ -1153,7 +1158,6 @@ async function startScanner() {
     render();
   }
 }
-
 async function stopScanner() {
   try { if (S.scannerInstance) { await S.scannerInstance.stop(); S.scannerInstance.clear(); S.scannerInstance = null; } } catch (e) {}
   S.scannerActive = false; render();
@@ -1413,7 +1417,7 @@ function viewAdminAbsensi() {
     '<div class="flex items-center gap-3 mb-4">' +
     '<div class="w-14 h-14 rounded-full bg-gradient-to-br from-purple-300 to-violet-400 flex items-center justify-center text-3xl shadow-md">📷</div>' +
     '<div><h2 class="text-2xl font-bold text-gray-800 font-head">Absensi QR Code</h2>' +
-    '<p class="text-gray-500 text-sm">Scan QR santri untuk otomatis catat kehadiran</p></div></div>' +
+    '<p class="text-gray-500 text-sm">Scan QR santri HADIR untuk catat kehadiran otomatis</p></div></div>' +
 
     '<div class="rounded-3xl p-6 text-white mb-4" style="background:linear-gradient(135deg,#a855f7 0%,#6366f1 100%);">' +
     '<div class="flex items-center gap-4 mb-4">' +
@@ -1427,13 +1431,17 @@ function viewAdminAbsensi() {
 
     (S.scannerActive ? '<div id="qr-reader" class="w-full max-w-md mx-auto bg-gray-100 rounded-2xl p-2 mb-4"></div>' : '') +
 
-    '<div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-sm text-blue-800">' +
+    '<div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-sm text-blue-800 mb-3">' +
     '<b>Cara pakai:</b><br>' +
-    '1. Klik <b>Mulai Scan</b><br>' +
-    '2. Izinkan akses kamera jika diminta browser<br>' +
-    '3. Arahkan kamera ke QR code santri<br>' +
-    '4. Sistem otomatis catat kehadiran (+' + ((S.rules.find(function(r){return r.name.toLowerCase().indexOf('kehadiran')!==-1;}) || {points:1}).points) + ' poin)<br>' +
-    '<b class="text-blue-700">💡 Tips:</b> Kamera tetap jalan untuk scan santri berikutnya. Cooldown 3 detik per santri.' +
+    '1. Klik <b>Mulai Scan</b> → izinkan kamera<br>' +
+    '2. Arahkan kamera ke QR code santri<br>' +
+    '3. Sistem otomatis catat <b>HADIR</b> + poin<br>' +
+    '<b class="text-blue-700">🔒 Anti-dobel:</b> kalau santri sudah absen hari ini, statusnya <b>diperbarui</b> dan poin <b>tidak ditambah</b> lagi.' +
+    '</div>' +
+
+    '<div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 text-sm text-amber-800">' +
+    '<b>💡 Untuk santri Sakit/Izin/Alfa:</b><br>' +
+    'Scan QR <b>hanya untuk yang hadir</b> di TPQ. Untuk santri yang tidak hadir, gunakan menu <b>"Absen & Poin"</b> untuk input status Sakit/Izin/Alfa secara manual atau massal.' +
     '</div>' +
 
     '</div>' +
