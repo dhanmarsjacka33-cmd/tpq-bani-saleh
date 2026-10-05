@@ -2817,6 +2817,9 @@ if('serviceWorker' in navigator){
 // =================================================================
 // BOOT
 // =================================================================
+// =================================================================
+// BOOT
+// =================================================================
 (function boot(){
   try{S.darkMode=localStorage.getItem('tpq_dark')==='1';}catch(e){}
   applyDarkMode();
@@ -2831,18 +2834,6 @@ if('serviceWorker' in navigator){
     S.loading=false;
     render();
     return;
-  }
-  Promise.all([loadData(),loadJadwal()]).then(function(){
-    if(S.user&&S.user.role==='santri')return Promise.all([loadSantriBadges(),loadGrafik()]);
-  }).catch(function(){}).then(function(){S.loading=false;render();});
-})();  try{S.darkMode=localStorage.getItem('tpq_dark')==='1';}catch(e){}
-  applyDarkMode();
-  const savedUser=sessionStorage.getItem('tpq_user');
-  if(savedUser&&token()){
-    try{
-      S.user=JSON.parse(savedUser);
-      if(S.user&&S.user.role==='santri'&&S.user.data&&S.user.data.mustChangePin)S.mustChangePin=true;
-    }catch(e){}
   }
   Promise.all([loadData(),loadJadwal()]).then(function(){
     if(S.user&&S.user.role==='santri')return Promise.all([loadSantriBadges(),loadGrafik()]);
