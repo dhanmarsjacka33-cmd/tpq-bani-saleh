@@ -539,8 +539,7 @@ document.addEventListener('keydown',function(e){
 // =================================================================
 // LOADERS
 // =================================================================
-async function loadData(){try{const data=await api('getInitialData');S.students=data.students||[];S.rules=data.pointRules||[];S.materials=data.materials||[];S.rewards=data.rewards||[];S.badges=data.badges||[];}catch(err){S.error=err.message;}}
-async function loadJadwal(){try{S.jadwalList=await api('getJadwal',S.jadwalKelas);}catch(e){S.jadwalList=[];}}
+async function loadData(){if(!token())return;try{const data=await api('getInitialData');S.students=data.students||[];S.rules=data.pointRules||[];S.materials=data.materials||[];S.rewards=data.rewards||[];S.badges=data.badges||[];}catch(err){S.error=err.message;}}async function loadJadwal(){try{S.jadwalList=await api('getJadwal',S.jadwalKelas);}catch(e){S.jadwalList=[];}}
 async function loadUsers(){try{S.usersList=await api('getUsers');}catch(e){S.usersList=[];}}
 async function loadKuis(){try{S.kuisList=await api('getKuisList');}catch(e){S.kuisList=[];}}
 async function loadEvaluasi(){try{S.evaluasiList=await api('getEvaluasiList');}catch(e){S.evaluasiList=[];}}
@@ -2820,6 +2819,23 @@ if('serviceWorker' in navigator){
 // =================================================================
 (function boot(){
   try{S.darkMode=localStorage.getItem('tpq_dark')==='1';}catch(e){}
+  applyDarkMode();
+  const savedUser=sessionStorage.getItem('tpq_user');
+  if(savedUser&&token()){
+    try{
+      S.user=JSON.parse(savedUser);
+      if(S.user&&S.user.role==='santri'&&S.user.data&&S.user.data.mustChangePin)S.mustChangePin=true;
+    }catch(e){}
+  }
+  if(!S.user||!token()){
+    S.loading=false;
+    render();
+    return;
+  }
+  Promise.all([loadData(),loadJadwal()]).then(function(){
+    if(S.user&&S.user.role==='santri')return Promise.all([loadSantriBadges(),loadGrafik()]);
+  }).catch(function(){}).then(function(){S.loading=false;render();});
+})();  try{S.darkMode=localStorage.getItem('tpq_dark')==='1';}catch(e){}
   applyDarkMode();
   const savedUser=sessionStorage.getItem('tpq_user');
   if(savedUser&&token()){
