@@ -3,10 +3,7 @@ const CACHE_NAME = 'tpq-bani-saleh-v1';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
-  'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap'
+  './manifest.json'
 ];
 
 // Install: cache assets
