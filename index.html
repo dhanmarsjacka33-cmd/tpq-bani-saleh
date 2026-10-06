@@ -245,7 +245,8 @@ const S={
   showShortcutHelp:false,
   /* ==== BARU ==== */
   drawerOpen:false,
-  poinSheetOpen:false
+poinSheetOpen:false,
+poinFilterSetoran:'semua'
 };
 
 const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -433,6 +434,7 @@ document.addEventListener('click',function(e){
       case 'close-drawer':S.drawerOpen=false;render();break;
       case 'open-sheet':S.poinSheetOpen=true;render();break;
       case 'close-sheet':S.poinSheetOpen=false;render();break;
+      case 'set-poin-filter-setoran':S.poinFilterSetoran=d.filter;S.selectedStudents=[];render();break;
       case 'close-qr':closeQRCard();break;
       case 'close-lightbox':closeLightbox();break;
       case 'next-lightbox':nextLightbox();break;
@@ -626,7 +628,7 @@ async function selectHadirHariIni(){
   }catch(err){showToast('Gagal: '+err.message,'error');}
   S.loadingHadir=false;render();
 }
-function getFilteredStudents(){let list=filterByKelas(S.students);const q=S.searchTerm.toLowerCase().trim();if(q)list=list.filter(function(s){return s.name.toLowerCase().indexOf(q)!==-1;});return list;}
+function getFilteredStudents(){let list=filterByKelas(S.students);if(S.poinFilterSetoran==='Iqra')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Iqra';});else if(S.poinFilterSetoran==='Al-Quran')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Al-Quran';});const q=S.searchTerm.toLowerCase().trim();if(q)list=list.filter(function(s){return s.name.toLowerCase().indexOf(q)!==-1;});return list;}
 function getFilteredStudentsSortedGrouped(){let list=getFilteredStudents();if(S.studentSort==='points')list=list.slice().sort(function(a,b){return b.points-a.points;});else if(S.studentSort==='kelas')list=list.slice().sort(function(a,b){return(a.kelas||'').localeCompare(b.kelas||'')||a.name.localeCompare(b.name);});else list=list.slice().sort(function(a,b){return a.name.localeCompare(b.name);});return list;}
 function toggleRule(ruleId){const id=parseInt(ruleId,10);if(S.selectedRules[id]!==undefined)delete S.selectedRules[id];else S.selectedRules[id]=1;render();}
 function setRuleMultiplier(ruleId,val){const id=parseInt(ruleId,10);S.selectedRules[id]=Math.max(1,parseInt(val,10)||1);render();}
@@ -1694,8 +1696,14 @@ function viewAdminPoin(){
     '<option value="points" '+(S.studentSort==='points'?'selected':'')+'>Poin</option>'+
     '<option value="kelas" '+(S.studentSort==='kelas'?'selected':'')+'>Kelas</option>'+
     '</select></div>'+
-    '<div class="flex flex-wrap gap-1.5 mb-3">'+
-    '<button data-action="select-hadir-hari-ini" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold">✅ Hadir hari ini</button>'+
+'<div class="flex flex-wrap gap-1.5 mb-2">'+
+'<span class="text-[10px] font-bold text-gray-500 self-center">Setoran:</span>'+
+'<button data-action="set-poin-filter-setoran" data-filter="semua" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='semua'?'bg-purple-500 text-white':'bg-gray-100 text-gray-600')+'">📚 Semua</button>'+
+'<button data-action="set-poin-filter-setoran" data-filter="Iqra" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='Iqra'?'bg-amber-500 text-white':'bg-gray-100 text-gray-600')+'">🟡 Iqra</button>'+
+'<button data-action="set-poin-filter-setoran" data-filter="Al-Quran" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='Al-Quran'?'bg-blue-500 text-white':'bg-gray-100 text-gray-600')+'">🔵 Al-Quran</button>'+
+'</div>'+
+'<div class="flex flex-wrap gap-1.5 mb-3">'+
+'<button data-action="select-hadir-hari-ini" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold">✅ Hadir hari ini</button>'+
     '<button data-action="select-all-filtered" class="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-[11px] font-bold">☑️ Pilih semua</button>'+
     '</div>'+
     '<div class="space-y-1.5">'+rows+'</div>'+
