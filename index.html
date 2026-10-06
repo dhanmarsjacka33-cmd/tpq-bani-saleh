@@ -627,7 +627,7 @@ async function selectHadirHariIni(){
   }catch(err){showToast('Gagal: '+err.message,'error');}
   S.loadingHadir=false;render();
 }
-function getFilteredStudents(){let list=filterByKelas(S.students);if(S.poinFilterSetoran==='Iqra')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Iqra';});else if(S.poinFilterSetoran==='Al-Quran')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Al-Quran';});const q=S.searchTerm.toLowerCase().trim();if(q)list=list.filter(function(s){return s.name.toLowerCase().indexOf(q)!==-1;});return list;}
+function getFilteredStudents(){let list=filterByKelas(S.students);if(S.poinFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.poinFilterSetoran);});const q=S.searchTerm.toLowerCase().trim();if(q)list=list.filter(function(s){return s.name.toLowerCase().indexOf(q)!==-1;});return list;}
 function getFilteredStudentsSortedGrouped(){let list=getFilteredStudents();if(S.studentSort==='points')list=list.slice().sort(function(a,b){return b.points-a.points;});else if(S.studentSort==='kelas')list=list.slice().sort(function(a,b){return(a.kelas||'').localeCompare(b.kelas||'')||a.name.localeCompare(b.name);});else list=list.slice().sort(function(a,b){return a.name.localeCompare(b.name);});return list;}
 function toggleRule(ruleId){const id=parseInt(ruleId,10);if(S.selectedRules[id]!==undefined)delete S.selectedRules[id];else S.selectedRules[id]=1;render();}
 function setRuleMultiplier(ruleId,val){const id=parseInt(ruleId,10);S.selectedRules[id]=Math.max(1,parseInt(val,10)||1);render();}
@@ -770,8 +770,7 @@ function setAllAbsen(status){
   if(S.absenKelasFilter)list=list.filter(function(s){return s.kelas===S.absenKelasFilter;});
   if(S.absenFilterPoin==='belum')list=list.filter(function(s){return!S.poinHariIni[s.id];});
   else if(S.absenFilterPoin==='sudah')list=list.filter(function(s){return!!S.poinHariIni[s.id];});
-  if(S.absenFilterSetoran==='Iqra')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Iqra';});
-  else if(S.absenFilterSetoran==='Al-Quran')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Al-Quran';});
+    if(S.absenFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.absenFilterSetoran);});
   list.forEach(function(s){if(!S.absenData[s.id])S.absenData[s.id]={status:status,keterangan:''};else S.absenData[s.id].status=status;});
   render();
 }
@@ -1511,8 +1510,7 @@ function viewKehadiranInput(){
   if(S.absenKelasFilter)list=list.filter(function(s){return s.kelas===S.absenKelasFilter;});
   if(S.absenFilterPoin==='belum')list=list.filter(function(s){return!S.poinHariIni[s.id];});
   else if(S.absenFilterPoin==='sudah')list=list.filter(function(s){return!!S.poinHariIni[s.id];});
-  if(S.absenFilterSetoran==='Iqra')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Iqra';});
-  else if(S.absenFilterSetoran==='Al-Quran')list=list.filter(function(s){const g=S.setoranGroupMap[s.id];return g&&g.tipe==='Al-Quran';});
+    if(S.absenFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.absenFilterSetoran);});
 
   const kelasList=getKelasList();
   let kelasOpts='<option value="">Semua</option>';
