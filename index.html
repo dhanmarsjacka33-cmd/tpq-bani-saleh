@@ -18,7 +18,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-/* ==== BASE ==== */
 *{-webkit-tap-highlight-color:transparent;}
 body{margin:0;font-family:'Fredoka',system-ui,sans-serif;background:#fef9f3;transition:background .3s,color .3s;overflow-x:hidden;}
 h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-weight:700;}
@@ -27,8 +26,6 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 ::-webkit-scrollbar-track{background:#fef3c7;}
 .hide-scroll::-webkit-scrollbar{display:none;}
 .hide-scroll{-ms-overflow-style:none;scrollbar-width:none;}
-
-/* ==== ANIMATIONS ==== */
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeIn .25s ease-out;}
 @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
@@ -46,28 +43,20 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 @keyframes confetti-fall{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--cx),400px) rotate(720deg);opacity:0}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .slide-up{animation:slideUp .25s ease-out;}
-
-/* ==== CARDS & BUTTONS ==== */
 .card-kid{border-radius:18px;box-shadow:0 3px 0 rgba(0,0,0,.06),0 6px 16px rgba(0,0,0,.05);border:2px solid #fff;transition:transform .2s,box-shadow .2s,background .3s;}
 .card-kid:hover{transform:translateY(-2px);}
 .btn-kid{border-radius:16px;border-bottom:3px solid rgba(0,0,0,.15);transition:transform .15s,border-width .15s;font-weight:700;}
 .btn-kid:active{transform:translateY(1px);border-bottom-width:1px;}
 .btn-kid:disabled{opacity:.45;cursor:not-allowed;}
-
-/* ==== PAGE HEADER ==== */
 .page-header{display:flex;align-items:center;gap:10px;padding:6px 0 12px;margin-bottom:12px;border-bottom:2px solid #fef3c7;}
 .page-header .icon-badge{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#fbbf24,#f97316);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 3px 8px rgba(245,158,11,.3);}
 .page-header h1{font-size:18px;font-weight:800;color:#1f2937;margin:0;line-height:1.2;}
 .page-header .sub{font-size:11px;color:#9ca3af;line-height:1.3;}
-
-/* ==== BOTTOM NAV ==== */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:white;border-top:2px solid #fef3c7;display:flex;justify-content:space-around;align-items:center;height:62px;padding:0 4px;box-shadow:0 -2px 12px rgba(0,0,0,.08);padding-bottom:env(safe-area-inset-bottom);}
 .bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;background:transparent;border:0;font-size:10px;font-weight:700;color:#9ca3af;transition:color .15s,transform .15s;cursor:pointer;font-family:inherit;position:relative;}
 .bottom-nav button .icon{font-size:22px;line-height:1;}
 .bottom-nav button.active{color:#f59e0b;transform:scale(1.05);}
 .bottom-nav button .notif-dot{position:absolute;top:4px;right:calc(50% - 20px);background:#ef4444;color:#fff;font-size:9px;font-weight:900;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center;border:2px solid white;}
-
-/* ==== STUDENT ROW ==== */
 .student-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:white;border:2px solid #f3f4f6;margin-bottom:6px;cursor:pointer;transition:all .15s;}
 .student-row:active{transform:scale(.99);}
 .student-row.selected{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-color:#3b82f6;box-shadow:0 2px 8px rgba(59,130,246,.2);}
@@ -79,40 +68,26 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 .student-row .points{font-size:16px;font-weight:900;flex-shrink:0;}
 .student-row .points.pos{color:#10b981;}
 .student-row .points.neg{color:#ef4444;}
-
-/* ==== STATUS GROUP ==== */
 .status-group{display:inline-flex;gap:2px;padding:2px;background:#f3f4f6;border-radius:10px;flex-shrink:0;}
 .status-mini{padding:5px 7px;border-radius:7px;font-size:12px;border:0;cursor:pointer;background:transparent;transition:all .15s;line-height:1;font-family:inherit;}
 .status-mini.active-hadir{background:#10b981;}
 .status-mini.active-sakit{background:#f59e0b;}
 .status-mini.active-izin{background:#3b82f6;}
 .status-mini.active-alfa{background:#ef4444;}
-
-/* ==== CHIP ==== */
 .chip-santri{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e40af;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;border:2px solid #93c5fd;}
 .chip-santri button{width:15px;height:15px;border-radius:50%;background:#ef4444;color:#fff;font-weight:900;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;line-height:1;}
-
-/* ==== BOTTOM SHEET ==== */
 .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;animation:fadeIn .2s;}
 .bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:91;background:white;border-radius:24px 24px 0 0;max-height:82vh;overflow-y:auto;padding:12px 16px 24px;animation:slideUp .25s ease-out;padding-bottom:calc(24px + env(safe-area-inset-bottom));box-shadow:0 -8px 32px rgba(0,0,0,.15);}
 .bottom-sheet .handle{width:40px;height:4px;background:#d1d5db;border-radius:2px;margin:0 auto 12px;}
-
-/* ==== FILTER DETAILS ==== */
 .filter-details summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#6b7280;padding:4px 0;}
 .filter-details summary::-webkit-details-marker{display:none;}
 .filter-details summary::before{content:'▸';transition:transform .2s;font-size:10px;}
 .filter-details[open] summary::before{transform:rotate(90deg);}
-
-/* ==== QR & VIDEO ==== */
 .video-wrap{position:relative;width:100%;padding-bottom:56.25%;height:0;background:#000;border-radius:16px;overflow:hidden;}
 .video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 #qr-reader{border-radius:16px;overflow:hidden;}
 #qr-reader video{border-radius:16px;}
-
-/* ==== RULE CHECKBOX ==== */
 .rule-checkbox{width:20px;height:20px;border-radius:6px;border:2px solid #cbd5e1;background:white;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:transparent;font-size:12px;font-weight:900;}
-
-/* ==== IMAGE THUMB ==== */
 .img-thumb{position:relative;width:100%;padding-bottom:100%;border-radius:14px;overflow:hidden;border:2px solid white;background:#f3f4f6;}
 .img-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .img-thumb .remove-btn{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:#ef4444;color:#fff;border:2px solid #fff;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25);font-size:12px;line-height:1;}
@@ -122,8 +97,6 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 .upload-zone:active{border-color:#7c3aed;background:#f3e8ff;}
 .upload-zone.dragover{border-color:#7c3aed;background:#ede9fe;transform:scale(1.02);}
 .upload-zone.disabled{opacity:.5;pointer-events:none;}
-
-/* ==== PRINT ==== */
 .rapor-header{background:linear-gradient(135deg,#fbbf24 0%,#fb923c 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 @media print{
   @page{margin:12mm}
@@ -134,8 +107,6 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
   .no-print{display:none!important}
   .card-kid{box-shadow:none!important;border:2px solid #fbbf24!important;page-break-inside:avoid}
 }
-
-/* ==== DARK MODE ==== */
 body.dark-mode{background:#0f172a;color:#e2e8f0;}
 body.dark-mode .card-kid{background:#1e293b!important;border-color:#334155!important;color:#e2e8f0;}
 body.dark-mode .bg-white{background:#1e293b!important;color:#e2e8f0;}
@@ -157,8 +128,6 @@ body.dark-mode .bottom-nav button{color:#64748b;}
 body.dark-mode .bottom-nav button.active{color:#fbbf24;}
 body.dark-mode .page-header{border-color:#334155;}
 body.dark-mode .page-header h1{color:#e2e8f0;}
-
-/* ==== SAFE AREA ==== */
 @supports(padding:max(0px)){
   .bottom-nav{padding-bottom:max(env(safe-area-inset-bottom),0px);}
 }
@@ -253,7 +222,17 @@ const S={
   myWeeklyRewardStatus:null,
   showUsulForm:false,
   usulRewardNama:'',
-  usulRewardDesc:''
+  usulRewardDesc:'',
+  /* ==== HAFALAN BULK STATE ==== */
+  hafalanKategori:'Bacaan',
+  hafalanTipe:'Iqra',
+  hafalanBulkStudents:[],
+  hafalanSearch:'',
+  hafalanKelasFilter:'',
+  hafalanSetoranFilter:'semua',
+  hafalanLogKategori:'semua',
+  hafalanLog:[],
+  hafalanLogLoaded:false
 };
 
 const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -335,12 +314,17 @@ function resetStateToLoggedOut(){
   S.lastUndo=null;S.aksiHariIni=[];
   S.drawerOpen=false;S.poinSheetOpen=false;
   S.pendingRedemptions=[];S.rewardUsulanList=[];S.myWeeklyRewardStatus=null;
+  S.hafalanKategori='Bacaan';S.hafalanTipe='Iqra';
+  S.hafalanBulkStudents=[];S.hafalanSearch='';S.hafalanKelasFilter='';S.hafalanSetoranFilter='semua';
+  S.hafalanLogKategori='semua';S.hafalanLog=[];S.hafalanLogLoaded=false;
 }
 
 function applyDarkMode(){if(S.darkMode)document.body.classList.add('dark-mode');else document.body.classList.remove('dark-mode');}
 
 let _searchDebounce=null;
 function debouncedSearch(val){S.searchTerm=val;clearTimeout(_searchDebounce);_searchDebounce=setTimeout(function(){render();},200);}
+let _hafalanSearchDebounce=null;
+function debouncedHafalanSearch(val){S.hafalanSearch=val;clearTimeout(_hafalanSearchDebounce);_hafalanSearchDebounce=setTimeout(function(){render();},200);}
 
 function addAksi(label,count,points){
   S.aksiHariIni.unshift({waktu:new Date().toISOString(),label:label,count:count,points:points});
@@ -538,6 +522,15 @@ document.addEventListener('click',function(e){
       case 'vote-reward':doVoteReward(d.id,d.nama);break;
       case 'close-usulan':doCloseUsulan(d.id,d.nama);break;
       case 'promote-usulan':promoteUsulanToReward(d.id);break;
+      /* ==== HAFALAN BULK ACTIONS ==== */
+      case 'set-hafalan-kategori':setHafalanKategori(d.kategori);break;
+      case 'set-hafalan-tipe':S.hafalanTipe=d.tipe;render();break;
+      case 'toggle-hafalan-student':toggleHafalanStudent(parseInt(d.id,10));break;
+      case 'clear-hafalan-students':clearHafalanStudents();break;
+      case 'select-all-hafalan':selectAllHafalan();break;
+      case 'submit-hafalan-bulk':submitHafalanBulk();break;
+      case 'set-hafalan-setoran-filter':S.hafalanSetoranFilter=d.filter;S.hafalanBulkStudents=[];render();break;
+      case 'set-hafalan-log-kategori':S.hafalanLogKategori=d.kategori;loadHafalanLog();break;
     }
   }catch(err){console.error('Action error:',action,err);showToast('Terjadi kesalahan: '+err.message,'error');}
 },true);
@@ -576,6 +569,7 @@ async function loadPoinHariIni(){S.loadingPoinHariIni=true;try{const[poin,groups
 async function loadPendingRedemptions(){try{S.pendingRedemptions=await api('getPendingRedemptions');}catch(e){S.pendingRedemptions=[];}}
 async function loadRewardUsulan(){try{S.rewardUsulanList=await api('getRewardUsulanList');}catch(e){S.rewardUsulanList=[];}}
 async function loadMyWeeklyRewardStatus(){try{S.myWeeklyRewardStatus=await api('getMyWeeklyRewardStatus');}catch(e){S.myWeeklyRewardStatus=null;}}
+async function loadHafalanLog(){try{S.hafalanLog=await api('getHafalanLog',200,S.hafalanLogKategori,null);S.hafalanLogLoaded=true;}catch(e){S.hafalanLog=[];S.hafalanLogLoaded=true;}render();}
 
 // =================================================================
 // LOGIN
@@ -754,32 +748,112 @@ async function doUndo(){
   }catch(err){showToast('Gagal undo: '+err.message,'error');}
   S.submitting=false;render();
 }
-async function submitHafalan(e){
-  if(e&&e.preventDefault)e.preventDefault();
-  const fd=new FormData(e.target);
-  const type=fd.get('type');
-  const data={studentId:fd.get('studentId'),type:type,status:fd.get('status')||'Lancar',note:fd.get('note')||'',jilid:'',halaman:'',juz:'',surah:'',ayat:''};
-  if(type==='Iqra'){
-    const jenis=fd.get('jenisIqra')||'Hitam';const jilid=fd.get('jilid')||'';const halaman=fd.get('halaman')||'';
-    if(!jilid)return showToast('Pilih Jilid Iqra!','warn');
-    if(!halaman)return showToast('Isi halaman Iqra!','warn');
-    data.jilid=jilid+' ('+jenis+')';data.halaman=halaman;
+
+// =================================================================
+// HAFALAN BULK ACTIONS
+// =================================================================
+function setHafalanKategori(k){
+  S.hafalanKategori=k;
+  S.hafalanTipe='Iqra';
+  S.hafalanBulkStudents=[];
+  render();
+}
+function toggleHafalanStudent(id){
+  const i=S.hafalanBulkStudents.indexOf(id);
+  if(i>=0)S.hafalanBulkStudents.splice(i,1);
+  else S.hafalanBulkStudents.push(id);
+  render();
+}
+function clearHafalanStudents(){S.hafalanBulkStudents=[];render();}
+function selectAllHafalan(){
+  const list=getFilteredHafalanStudents();
+  const ids=list.map(function(s){return s.id;});
+  if(S.hafalanBulkStudents.length===ids.length&&ids.length>0)S.hafalanBulkStudents=[];
+  else S.hafalanBulkStudents=ids.slice();
+  render();
+}
+function getFilteredHafalanStudents(){
+  let list=S.students.slice();
+  if(S.hafalanKelasFilter)list=list.filter(function(s){return s.kelas===S.hafalanKelasFilter;});
+  if(S.hafalanSetoranFilter!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.hafalanSetoranFilter);});
+  const q=S.hafalanSearch.toLowerCase().trim();
+  if(q)list=list.filter(function(s){return s.name.toLowerCase().indexOf(q)!==-1;});
+  list.sort(function(a,b){return a.name.localeCompare(b.name);});
+  return list;
+}
+async function submitHafalanBulk(){
+  if(!S.hafalanBulkStudents.length)return showToast('Pilih minimal 1 santri!','warn');
+
+  const payload={
+    studentIds:S.hafalanBulkStudents.slice(),
+    kategori:S.hafalanKategori,
+    tipe:S.hafalanTipe,
+    status:'Lancar',
+    note:'',
+    jilid:'',
+    halaman:'',
+    juz:'',
+    surah:'',
+    ayat:''
+  };
+
+  if(S.hafalanKategori==='Bacaan'){
+    if(S.hafalanTipe==='Iqra'){
+      const jenisEl=document.getElementById('hafalanJenisIqra');
+      const jilidEl=document.getElementById('hafalanJilid');
+      const halEl=document.getElementById('hafalanHalaman');
+      const jenis=jenisEl?jenisEl.value:'Hitam';
+      const jilid=jilidEl?jilidEl.value:'';
+      const halaman=halEl?halEl.value:'';
+      if(!jilid)return showToast('Pilih Jilid Iqra!','warn');
+      if(!halaman)return showToast('Isi halaman Iqra!','warn');
+      payload.jilid=jilid+' ('+jenis+')';
+      payload.halaman=halaman;
+    }else{
+      const juzEl=document.getElementById('hafalanJuz');
+      const surahEl=document.getElementById('hafalanSurah');
+      const fromEl=document.getElementById('hafalanAyatFrom');
+      const toEl=document.getElementById('hafalanAyatTo');
+      const juz=juzEl?juzEl.value:'';
+      const surah=surahEl?surahEl.value:'';
+      const ayatFrom=fromEl?fromEl.value:'';
+      const ayatTo=toEl?toEl.value:'';
+      if(!juz)return showToast('Pilih Juz!','warn');
+      if(!surah)return showToast('Pilih Surah!','warn');
+      if(!ayatFrom)return showToast('Pilih Ayat!','warn');
+      payload.juz=juz;
+      payload.surah=surah;
+      payload.ayat=(ayatTo&&ayatTo!==ayatFrom)?(ayatFrom+'-'+ayatTo):ayatFrom;
+    }
   }else{
-    const juz=fd.get('juz')||'';const surah=fd.get('surah')||'';
-    const ayatFrom=fd.get('ayatFrom')||'';const ayatTo=fd.get('ayatTo')||'';
+    const juzEl=document.getElementById('hafalanJuz');
+    const surahEl=document.getElementById('hafalanSurah');
+    const fromEl=document.getElementById('hafalanAyatFrom');
+    const toEl=document.getElementById('hafalanAyatTo');
+    const juz=juzEl?juzEl.value:'';
+    const surah=surahEl?surahEl.value:'';
+    const ayatFrom=fromEl?fromEl.value:'';
+    const ayatTo=toEl?toEl.value:'';
     if(!juz)return showToast('Pilih Juz!','warn');
     if(!surah)return showToast('Pilih Surah!','warn');
     if(!ayatFrom)return showToast('Pilih Ayat!','warn');
-    data.juz=juz;data.surah=surah;
-    data.ayat=(ayatTo&&ayatTo!==ayatFrom)?(ayatFrom+'-'+ayatTo):ayatFrom;
+    payload.juz=juz;
+    payload.surah=surah;
+    payload.ayat=(ayatTo&&ayatTo!==ayatFrom)?(ayatFrom+'-'+ayatTo):ayatFrom;
   }
+
+  const statusEl=document.getElementById('hafalanStatus');
+  if(statusEl)payload.status=statusEl.value||'Lancar';
+  const noteEl=document.getElementById('hafalanNote');
+  if(noteEl)payload.note=noteEl.value||'';
+
   S.submitting=true;render();
   try{
-    await api('saveHafalan',data);
+    const res=await api('saveHafalanBulk',payload);
     playDing();playConfetti();
-    showToast('Setoran berhasil disimpan!','success');
-    e.target.reset();S.hafalanType='Iqra';
-    onHafalanTypeChange('Iqra');onHafalanJuzChange('');
+    addAksi('Setoran '+payload.kategori+' ke '+res.saved+' santri',res.saved,0);
+    showToast('✅ Setoran '+payload.kategori+' tersimpan untuk '+res.saved+' santri!','success');
+    S.hafalanBulkStudents=[];
     await loadPoinHariIni();
   }catch(err){showToast('Gagal: '+err.message,'error');}
   S.submitting=false;render();
@@ -972,7 +1046,7 @@ async function saveReward(e){
 async function deleteReward(id,nama){if(!confirm('Hapus reward "'+nama+'"?'))return;try{await api('deleteReward',id);await loadData();showToast('Reward dihapus','success');}catch(err){showToast('Gagal: '+err.message,'error');}render();}
 
 // =================================================================
-// REDEMPTION (request reward)
+// REDEMPTION
 // =================================================================
 async function doRequestReward(rewardId){
   if(!confirm('Kirim permintaan reward ini ke admin?'))return;
@@ -1012,7 +1086,7 @@ async function doRejectRedemption(redemptionId,rewardName,studentName){
 }
 
 // =================================================================
-// USUL REWARD ACTIONS
+// USUL REWARD
 // =================================================================
 function openUsulForm(){S.showUsulForm=true;S.usulRewardNama='';S.usulRewardDesc='';render();}
 function closeUsulForm(){S.showUsulForm=false;render();}
@@ -1176,7 +1250,7 @@ async function saveBadge(e){
 async function deleteBadge(id,nama){if(!confirm('Hapus badge "'+nama+'"?'))return;try{await api('deleteBadge',id);await loadData();showToast('Badge dihapus','success');}catch(err){showToast('Gagal: '+err.message,'error');}render();}
 
 // =================================================================
-// EVALUASI ACTIONS
+// EVALUASI
 // =================================================================
 function onGuruSelectChange(v){
   const wrap=document.getElementById('evaluasiGuruManual');
@@ -1255,7 +1329,6 @@ function restoreFocus(id,selStart,selEnd){
     try{el.focus();if(selStart!==null&&selEnd!==null&&el.setSelectionRange)el.setSelectionRange(selStart,selEnd);}catch(e){}
   },0);
 }
-function onHafalanTypeChange(v){S.hafalanType=v;const fi=document.getElementById('fieldsIqra');const fq=document.getElementById('fieldsQuran');if(!fi||!fq)return;if(v==='Iqra'){fi.classList.remove('hidden');fq.classList.add('hidden');}else{fi.classList.add('hidden');fq.classList.remove('hidden');}}
 function onHafalanJuzChange(v){const surahSel=document.getElementById('hafalanSurah');const fromSel=document.getElementById('hafalanAyatFrom');const toSel=document.getElementById('hafalanAyatTo');if(!surahSel)return;let opts='<option value="">-- Pilih Surah --</option>';if(v){const list=JUZ_SURAH[parseInt(v,10)]||[];list.forEach(function(nama){opts+='<option value="'+esc(nama)+'">'+esc(nama)+'</option>';});}surahSel.innerHTML=opts;if(fromSel)fromSel.innerHTML='<option value="">-- Dari Ayat --</option>';if(toSel)toSel.innerHTML='<option value="">-- Sampai --</option>';}
 function onHafalanSurahChange(nama){const fromSel=document.getElementById('hafalanAyatFrom');const toSel=document.getElementById('hafalanAyatTo');if(!fromSel)return;let fromOpts='<option value="">-- Dari Ayat --</option>';if(nama){const total=SURAH_AYAT[nama]||0;for(let i=1;i<=total;i++)fromOpts+='<option value="'+i+'">'+i+'</option>';}fromSel.innerHTML=fromOpts;if(toSel)toSel.innerHTML='<option value="">-- Sampai --</option>';}
 function onHafalanAyatFromChange(v){const toSel=document.getElementById('hafalanAyatTo');const surahSel=document.getElementById('hafalanSurah');if(!toSel||!surahSel)return;const surahNama=surahSel.value;let toOpts='<option value="">-- Sampai --</option>';if(surahNama&&v){const total=SURAH_AYAT[surahNama]||0;const from=parseInt(v,10);for(let i=from;i<=total;i++)toOpts+='<option value="'+i+'">'+i+'</option>';}toSel.innerHTML=toOpts;}
@@ -1277,7 +1350,6 @@ function render(opts){
   }catch(e){}
   const scrollY=preserveScroll?(window.scrollY||window.pageYOffset||0):0;
   const app=document.getElementById('app');
-
   if(S.loading){
     app.innerHTML='<div class="min-h-screen flex items-center justify-center" style="background:linear-gradient(135deg,#fef3c7,#fce7f3,#e0e7ff);">'+
       '<div class="bg-white rounded-3xl shadow-2xl p-12 text-center border-4 border-yellow-300">'+
@@ -1296,7 +1368,6 @@ function render(opts){
   }
   if(!S.user){app.innerHTML=renderLogin();restoreFocus(activeId,selStart,selEnd);return;}
   if(S.mustChangePin){app.innerHTML=renderForcePinChange();restoreFocus(activeId,selStart,selEnd);return;}
-
   app.innerHTML=
     renderNav()+
     '<main style="padding-bottom:120px;">'+
@@ -1306,14 +1377,13 @@ function render(opts){
     renderLightbox()+
     renderPreviewPoinModal()+
     renderShortcutHelp();
-
   restoreFocus(activeId,selStart,selEnd);
   if(preserveScroll&&scrollY>0){requestAnimationFrame(function(){window.scrollTo(0,scrollY);});}
 }
 async function retry(){S.loading=true;S.error='';render();await loadData();S.loading=false;render();}
 
 // =================================================================
-// NAV + DRAWER
+// NAV
 // =================================================================
 function renderNav(){
   const isAdmin=S.user.role==='admin';
@@ -1335,7 +1405,7 @@ function renderNav(){
       {v:'dashboard',l:'Beranda',i:'🏠',g:'Utama'},
       {v:'kehadiran_input',l:'Absen & Poin',i:'⚡',g:'Utama'},
       {v:'poin',l:'Input Poin',i:'🎯',g:'Utama'},
-      {v:'hafalan',l:'Setoran',i:'📖',g:'Utama'},
+      {v:'hafalan',l:'Setoran Bacaan/Hafalan',i:'📖',g:'Utama'},
       {v:'absensi',l:'Absensi QR',i:'📷',g:'Utama'},
       {v:'kelola_poin',l:'Aturan Poin',i:'🎨',g:'Kelola'},
       {v:'kelola_materi',l:'Materi',i:'📚',g:'Kelola'},
@@ -1367,7 +1437,6 @@ function renderNav(){
       {v:'evaluasi_guru',l:'Nilai Guru',i:'⭐',g:'Lainnya'},
       {v:'ganti_pin',l:'Ganti PIN',i:'🔑',g:'Lainnya'}
     ];
-
   let kelasOpts='';
   if(isAdmin){
     const kelasList=getKelasList();
@@ -1377,7 +1446,6 @@ function renderNav(){
       kelasOpts='<select onchange="S.kelasFilter=this.value;render();" class="bg-amber-50 border-2 border-amber-200 rounded-full px-2 py-1 text-[11px] font-bold max-w-[90px]">'+opts+'</select>';
     }
   }
-
   const header='<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b-2 border-amber-100 px-3 py-2 flex items-center justify-between" style="padding-top:max(8px,env(safe-area-inset-top));">'+
     '<div class="flex items-center gap-2 min-w-0">'+
     '<div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style="background:linear-gradient(135deg,#fbbf24,#f97316);box-shadow:0 2px 6px rgba(245,158,11,.3);">📚</div>'+
@@ -1390,7 +1458,6 @@ function renderNav(){
     '<button data-action="toggle-dark" class="p-2 rounded-full hover:bg-gray-100 text-base" title="Dark mode">'+(S.darkMode?'☀️':'🌙')+'</button>'+
     '<button data-action="do-logout" class="p-2 rounded-full hover:bg-red-50 text-base" title="Keluar">🚪</button>'+
     '</div></header>';
-
   let bottomNav='<nav class="bottom-nav">';
   mainItems.forEach(function(it){
     const active=S.view===it.v;
@@ -1403,7 +1470,6 @@ function renderNav(){
   }
   bottomNav+='<button data-action="open-drawer" class="">'+notifBadge+'<span class="icon">☰</span><span>Menu</span></button>';
   bottomNav+='</nav>';
-
   return header+bottomNav+renderDrawer(allMenu);
 }
 
@@ -1438,7 +1504,7 @@ function renderDrawer(allMenu){
 }
 
 // =================================================================
-// STICKY ACTION BAR (poin view)
+// STICKY ACTION BAR
 // =================================================================
 function renderStickyActionBar(){
   if(!S.user||S.user.role!=='admin')return '';
@@ -1648,19 +1714,15 @@ function viewKehadiranInput(){
   if(S.absenFilterPoin==='belum')list=list.filter(function(s){return!S.poinHariIni[s.id];});
   else if(S.absenFilterPoin==='sudah')list=list.filter(function(s){return!!S.poinHariIni[s.id];});
   if(S.absenFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.absenFilterSetoran);});
-
   const kelasList=getKelasList();
   let kelasOpts='<option value="">Semua</option>';
   kelasList.forEach(function(k){kelasOpts+='<option value="'+esc(k)+'" '+(S.absenKelasFilter===k?'selected':'')+'>'+esc(k)+'</option>';});
-
   let statHadir=0,statSakit=0,statIzin=0,statAlfa=0;
   list.forEach(function(s){const st=S.absenData[s.id]?S.absenData[s.id].status:'Hadir';if(st==='Hadir')statHadir++;else if(st==='Sakit')statSakit++;else if(st==='Izin')statIzin++;else if(st==='Alfa')statAlfa++;});
-
   let sudahDapat=0,belumDapat=0;
   let allList=S.students;
   if(S.absenKelasFilter)allList=allList.filter(function(s){return s.kelas===S.absenKelasFilter;});
   allList.forEach(function(s){if(S.poinHariIni[s.id])sudahDapat++;else belumDapat++;});
-
   let rows='';
   if(list.length===0)rows='<p class="text-center text-gray-400 py-8 text-xs">Tidak ada santri</p>';
   else list.forEach(function(s){
@@ -1683,23 +1745,19 @@ function viewKehadiranInput(){
       '<div class="status-group">'+statusBtns+'</div>'+
       '</div>';
   });
-
   const ruleKehadiran=S.rules.find(function(r){return r.name.toLowerCase().indexOf('kehadiran')!==-1;});
   let ruleOpts='';
   S.rules.forEach(function(r){const selected=(S.bulkRuleId&&S.bulkRuleId==r.id)||(!S.bulkRuleId&&ruleKehadiran&&ruleKehadiran.id===r.id);ruleOpts+='<option value="'+r.id+'" '+(selected?'selected':'')+'>'+esc(r.name)+' ('+(r.points>0?'+':'')+r.points+')</option>';});
-
   const filterChips=[
     {k:'semua',l:'Semua',c:allList.length,clr:'bg-gray-100 text-gray-700'},
     {k:'belum',l:'⚠️ Belum',c:belumDapat,clr:'bg-amber-100 text-amber-700'},
     {k:'sudah',l:'✅ Sudah',c:sudahDapat,clr:'bg-green-100 text-green-700'}
   ].map(function(f){const active=S.absenFilterPoin===f.k;return '<button data-action="set-absen-filter-poin" data-filter="'+f.k+'" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+f.clr+(active?' ring-2 ring-blue-400':'')+'">'+f.l+' '+f.c+'</button>';}).join('');
-
   const setoranChips=[
     {k:'semua',l:'📚 Semua'},
     {k:'Iqra',l:'🟡 Iqra'},
     {k:'Al-Quran',l:'🔵 Quran'}
   ].map(function(f){const active=S.absenFilterSetoran===f.k;return '<button data-action="set-absen-filter-setoran" data-filter="'+f.k+'" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(active?'bg-purple-500 text-white':'bg-gray-100 text-gray-600')+'">'+f.l+'</button>';}).join('');
-
   return '<div class="fade-in">'+
     '<div class="page-header">'+
     '<div class="icon-badge">⚡</div>'+
@@ -1734,7 +1792,7 @@ function viewKehadiranInput(){
 }
 
 // =================================================================
-// VIEW: INPUT POIN
+// VIEW: INPUT POIN (Admin)
 // =================================================================
 function viewAdminPoin(){
   let chipsHtml='';
@@ -1752,13 +1810,11 @@ function viewAdminPoin(){
       '</div>'+
       '<div class="flex flex-wrap gap-1">'+chipItems+extra+'</div></div>';
   }
-
   const selRules=Object.keys(S.selectedRules).map(function(id){
     const r=S.rules.find(function(x){return x.id===parseInt(id,10);});
     return r?{id:r.id,name:r.name,pts:r.points*(r.isMultiplier?(S.selectedRules[id]||1):1)}:null;
   }).filter(Boolean);
   const totalPts=selRules.reduce(function(a,r){return a+r.pts;},0);
-
   let actChips='';
   if(selRules.length>0){
     actChips='<div class="flex flex-wrap gap-1 mb-3">'+
@@ -1768,7 +1824,6 @@ function viewAdminPoin(){
       '<button data-action="clear-rule-selection" class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">Reset</button>'+
       '</div>';
   }
-
   const filtered=getFilteredStudentsSortedGrouped();
   let rows='';
   if(filtered.length===0)rows='<p class="text-center text-gray-400 py-8 text-xs">Tidak ada santri</p>';
@@ -1784,7 +1839,6 @@ function viewAdminPoin(){
       '<div class="points '+(s.points<0?'neg':'pos')+'">'+s.points+'</div>'+
       '</div>';
   });
-
   let sheet='';
   if(S.poinSheetOpen){
     const posRules=S.rules.filter(function(r){return r.points>=0;}).sort(function(a,b){return a.points-b.points;});
@@ -1815,7 +1869,6 @@ function viewAdminPoin(){
       '<button data-action="close-sheet" class="btn-kid w-full bg-blue-500 text-white py-3 mt-4 rounded-2xl font-black">Selesai</button>'+
       '</div>';
   }
-
   return '<div class="fade-in">'+
     '<div class="page-header">'+
     '<div class="icon-badge">🎯</div>'+
@@ -1850,6 +1903,154 @@ function viewAdminPoin(){
 }
 
 // =================================================================
+// VIEW: HAFALAN BULK (Admin)
+// =================================================================
+function viewAdminHafalan(){
+  const filtered=getFilteredHafalanStudents();
+  const selected=S.hafalanBulkStudents;
+  const kategori=S.hafalanKategori;
+  const tipe=S.hafalanTipe;
+
+  let kelasOpts='<option value="">Semua Kelas</option>';
+  getKelasList().forEach(function(k){kelasOpts+='<option value="'+esc(k)+'" '+(S.hafalanKelasFilter===k?'selected':'')+'>'+esc(k)+'</option>';});
+
+  let setoranChips=[
+    {k:'semua',l:'📚 Semua'},
+    {k:'Iqra',l:'🟡 Iqra'},
+    {k:'Al-Quran',l:'🔵 Al-Quran'}
+  ].map(function(f){
+    const active=S.hafalanSetoranFilter===f.k;
+    return '<button data-action="set-hafalan-setoran-filter" data-filter="'+f.k+'" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(active?'bg-purple-500 text-white':'bg-gray-100 text-gray-600')+'">'+f.l+'</button>';
+  }).join('');
+
+  let rows='';
+  if(filtered.length===0)rows='<p class="text-center text-gray-400 py-8 text-xs">Tidak ada santri</p>';
+  else filtered.forEach(function(s){
+    const sel=selected.indexOf(s.id)!==-1;
+    const group=S.setoranGroupMap[s.id];
+    const groupTag=group?'<span class="text-[10px] font-bold '+(group.tipe==='Iqra'?'text-amber-600':'text-blue-600')+'">'+esc(group.detail)+'</span>':'';
+    rows+='<div data-action="toggle-hafalan-student" data-id="'+s.id+'" class="student-row '+(sel?'selected':'')+'">'+
+      '<div class="check">'+(sel?'✓':'')+'</div>'+
+      '<div class="info">'+
+      '<div class="name">'+esc(s.name)+'</div>'+
+      '<div class="meta">'+esc(s.kelas)+' '+groupTag+'</div>'+
+      '</div>'+
+      '<div class="points '+(s.points<0?'neg':'pos')+'">'+s.points+'</div>'+
+      '</div>';
+  });
+
+  let chipsHtml='';
+  if(selected.length>0){
+    const chipItems=selected.slice(0,8).map(function(id){
+      const s=S.students.find(function(x){return x.id===id;});
+      if(!s)return '';
+      return '<span class="chip-santri">'+esc(s.name)+'<button data-action="toggle-hafalan-student" data-id="'+s.id+'">×</button></span>';
+    }).join('');
+    const extra=selected.length>8?'<span class="chip-santri bg-amber-100 text-amber-700 border-amber-300">+'+(selected.length-8)+'</span>':'';
+    chipsHtml='<div class="bg-white rounded-2xl p-2 border-2 border-blue-100 mb-3">'+
+      '<div class="flex items-center justify-between mb-1.5">'+
+      '<span class="text-[11px] font-black text-blue-700">👥 TERPILIH ('+selected.length+')</span>'+
+      '<button data-action="clear-hafalan-students" class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">Hapus</button>'+
+      '</div>'+
+      '<div class="flex flex-wrap gap-1">'+chipItems+extra+'</div></div>';
+  }
+
+  const katTabs=[
+    {k:'Bacaan',l:'📖 Bacaan',c:'from-blue-400 to-cyan-500'},
+    {k:'Hafalan',l:'🎯 Hafalan',c:'from-green-400 to-emerald-500'}
+  ].map(function(t){
+    const active=kategori===t.k;
+    return '<button data-action="set-hafalan-kategori" data-kategori="'+t.k+'" class="flex-1 py-3 rounded-2xl font-black text-sm '+(active?'bg-gradient-to-r '+t.c+' text-white shadow-md':'bg-gray-100 text-gray-600')+'">'+t.l+'</button>';
+  }).join('');
+
+  let tipeTabs='';
+  if(kategori==='Bacaan'){
+    const tipeList=[
+      {k:'Iqra',l:'🟡 Iqra'},
+      {k:'Al-Qur\'an',l:'🔵 Al-Qur\'an'}
+    ].map(function(t){
+      const active=tipe===t.k;
+      return '<button data-action="set-hafalan-tipe" data-tipe="'+esc(t.k)+'" class="flex-1 py-2 rounded-xl font-bold text-xs '+(active?'bg-purple-500 text-white':'bg-gray-100 text-gray-600')+'">'+t.l+'</button>';
+    }).join('');
+    tipeTabs='<div class="flex gap-2 mb-3">'+tipeList+'</div>';
+  }
+
+  let jilidOpts='';[1,2,3,4,5,6].forEach(function(n){jilidOpts+='<option value="'+n+'">Iqra '+n+'</option>';});
+  let juzOpts='<option value="">-- Pilih Juz --</option>';for(let j=1;j<=30;j++)juzOpts+='<option value="'+j+'">Juz '+j+'</option>';
+
+  let formFields='';
+  if(kategori==='Bacaan' && tipe==='Iqra'){
+    formFields=
+      '<div><label class="block text-xs font-bold mb-1">Jenis Iqra</label>'+
+      '<select id="hafalanJenisIqra" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm">'+
+      '<option value="Hitam">⚫ Iqra Hitam</option><option value="Hijau">🟢 Iqra Hijau</option></select></div>'+
+      '<div class="flex gap-2">'+
+      '<div class="flex-1"><label class="block text-xs font-bold mb-1">Jilid</label>'+
+      '<select id="hafalanJilid" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm">'+jilidOpts+'</select></div>'+
+      '<div class="flex-1"><label class="block text-xs font-bold mb-1">Halaman</label>'+
+      '<input type="number" id="hafalanHalaman" min="1" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm" placeholder="Contoh: 15" /></div>'+
+      '</div>';
+  }else{
+    formFields=
+      '<div><label class="block text-xs font-bold mb-1">Juz</label>'+
+      '<select id="hafalanJuz" onchange="onHafalanJuzChange(this.value)" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm">'+juzOpts+'</select></div>'+
+      '<div><label class="block text-xs font-bold mb-1">Surah</label>'+
+      '<select id="hafalanSurah" onchange="onHafalanSurahChange(this.value)" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm"><option value="">-- Pilih Surah --</option></select></div>'+
+      '<div class="flex gap-2">'+
+      '<div class="flex-1"><label class="block text-xs font-bold mb-1">Dari Ayat</label>'+
+      '<select id="hafalanAyatFrom" onchange="onHafalanAyatFromChange(this.value)" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm"><option value="">-- Dari --</option></select></div>'+
+      '<div class="flex-1"><label class="block text-xs font-bold mb-1">Sampai Ayat</label>'+
+      '<select id="hafalanAyatTo" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm"><option value="">-- Sampai --</option></select></div>'+
+      '</div>';
+  }
+
+  return '<div class="fade-in">'+
+    '<div class="page-header">'+
+    '<div class="icon-badge">📖</div>'+
+    '<div class="flex-1"><h1>Setoran</h1>'+
+    '<div class="sub">'+selected.length+' santri terpilih · '+kategori+'</div></div></div>'+
+
+    '<div class="flex gap-2 mb-3">'+katTabs+'</div>'+
+    tipeTabs+
+
+    '<div class="card-kid bg-white p-4 space-y-3 mb-3">'+
+    formFields+
+    '<div><label class="block text-xs font-bold mb-1">Status</label>'+
+    '<select id="hafalanStatus" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm font-bold">'+
+    '<option value="Lancar">Lancar ✅</option><option value="Tidak Lancar">Tidak Lancar ❌</option></select></div>'+
+    '<div><label class="block text-xs font-bold mb-1">Catatan (opsional)</label>'+
+    '<textarea id="hafalanNote" rows="2" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm resize-none" placeholder="Pesan untuk santri..."></textarea></div>'+
+    '</div>'+
+
+    chipsHtml+
+
+    '<div class="flex gap-2 mb-3">'+
+    '<input type="text" placeholder="Cari nama..." value="'+esc(S.hafalanSearch)+'" oninput="debouncedHafalanSearch(this.value)" class="flex-1 bg-white border-2 border-gray-200 rounded-xl px-3 py-2 text-xs" />'+
+    '<select onchange="S.hafalanKelasFilter=this.value;S.hafalanBulkStudents=[];render();" class="bg-white border-2 border-gray-200 rounded-xl px-3 py-2 text-xs font-bold">'+kelasOpts+'</select>'+
+    '</div>'+
+
+    '<div class="flex flex-wrap gap-1.5 mb-2">'+
+    '<span class="text-[10px] font-bold text-gray-500 self-center">Setoran:</span>'+
+    setoranChips+
+    '</div>'+
+
+    '<div class="flex flex-wrap gap-1.5 mb-3">'+
+    '<button data-action="select-all-hafalan" class="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-[11px] font-bold">'+
+    (selected.length===filtered.length&&filtered.length>0?'❌ Batal Semua':'☑️ Pilih Semua')+'</button>'+
+    '<button data-action="clear-hafalan-students" class="px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-[11px] font-bold">🗑️ Kosongkan</button>'+
+    '</div>'+
+
+    '<div class="space-y-1.5">'+rows+'</div>'+
+
+    '<div class="sticky mt-4 flex gap-2 bg-white/95 backdrop-blur p-2 rounded-2xl shadow-lg border-2 border-emerald-200" style="bottom:76px;">'+
+    '<button data-action="submit-hafalan-bulk" '+(S.submitting||selected.length===0?'disabled':'')+' class="flex-1 bg-gradient-to-r from-emerald-400 to-green-500 text-white py-3 rounded-xl text-sm font-black disabled:opacity-40">'+
+    (S.submitting?'⏳ Menyimpan...':'💾 Simpan Setoran ('+selected.length+')')+'</button>'+
+    '</div>'+
+
+    '</div>';
+}
+
+// =================================================================
 // VIEW: DASHBOARD ADMIN
 // =================================================================
 function viewAdminDashboard(){
@@ -1880,8 +2081,8 @@ function viewAdminDashboard(){
     '<div class="text-[10px] opacity-80">Paling sering dipakai</div></button>'+
     '<button data-action="goto" data-view="hafalan" class="bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-2xl p-4 text-left">'+
     '<div class="text-3xl mb-1">📖</div>'+
-    '<div class="font-black text-sm">Setoran Hafalan</div>'+
-    '<div class="text-[10px] opacity-80">Catat setoran</div></button>'+
+    '<div class="font-black text-sm">Setoran Bulk</div>'+
+    '<div class="text-[10px] opacity-80">Bacaan & Hafalan</div></button>'+
     '<button data-action="goto" data-view="absensi" class="bg-gradient-to-br from-purple-400 to-violet-500 text-white rounded-2xl p-4 text-left">'+
     '<div class="text-3xl mb-1">📷</div>'+
     '<div class="font-black text-sm">Scan QR</div>'+
@@ -1992,54 +2193,6 @@ function viewAdminKelolaPoin(){
     '<div class="card-kid bg-white p-4"><h3 class="font-bold text-red-700 mb-2 flex items-center gap-2 text-sm">⚠ Poin Hukuman ('+neg.length+')</h3>'+
     '<div class="space-y-1.5">'+(neg.map(ruleCard).join('')||'<p class="text-gray-400 text-xs text-center py-2">Kosong</p>')+'</div></div>'+
     '</div></div>';
-}
-
-// =================================================================
-// VIEW: SETORAN HAFALAN
-// =================================================================
-function viewAdminHafalan(){
-  let opts='<option value="">-- Pilih Santri --</option>';
-  filterByKelas(S.students).forEach(function(s){opts+='<option value="'+s.id+'">'+esc(s.name)+'</option>';});
-  let jilidOpts='';[1,2,3,4,5,6].forEach(function(n){jilidOpts+='<option value="'+n+'">Iqra '+n+'</option>';});
-  let juzOpts='<option value="">-- Juz --</option>';for(let j=1;j<=30;j++)juzOpts+='<option value="'+j+'">Juz '+j+'</option>';
-  return '<div class="fade-in">'+
-    '<div class="page-header">'+
-    '<div class="icon-badge">📖</div>'+
-    '<div class="flex-1"><h1>Setoran Hafalan</h1><div class="sub">Catat setoran santri</div></div></div>'+
-    '<form onsubmit="submitHafalan(event)" class="space-y-3">'+
-    '<div class="card-kid bg-white p-4 space-y-3">'+
-    '<div><label class="block text-xs font-bold mb-1">Santri</label>'+
-    '<select name="studentId" required class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm font-medium">'+opts+'</select></div>'+
-    '<div><label class="block text-xs font-bold mb-1">Kategori</label>'+
-    '<select name="type" onchange="onHafalanTypeChange(this.value)" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm font-medium">'+
-    '<option value="Iqra">Iqra</option><option value="Al-Qur\'an">Al-Qur\'an</option></select></div>'+
-    '<div id="fieldsIqra" class="space-y-3">'+
-    '<div><label class="block text-xs font-bold mb-1">Jenis Iqra</label>'+
-    '<select name="jenisIqra" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm">'+
-    '<option value="Hitam">⚫ Hitam</option><option value="Hijau">🟢 Hijau</option></select></div>'+
-    '<div class="flex gap-2">'+
-    '<div class="flex-1"><label class="block text-xs font-bold mb-1">Jilid</label>'+
-    '<select name="jilid" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm">'+jilidOpts+'</select></div>'+
-    '<div class="flex-1"><label class="block text-xs font-bold mb-1">Halaman</label>'+
-    '<input type="number" name="halaman" min="1" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm" /></div></div></div>'+
-    '<div id="fieldsQuran" class="space-y-3 hidden">'+
-    '<div><label class="block text-xs font-bold mb-1">Juz</label>'+
-    '<select name="juz" id="hafalanJuz" onchange="onHafalanJuzChange(this.value)" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm">'+juzOpts+'</select></div>'+
-    '<div><label class="block text-xs font-bold mb-1">Surah</label>'+
-    '<select name="surah" id="hafalanSurah" onchange="onHafalanSurahChange(this.value)" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm"><option value="">-- Pilih --</option></select></div>'+
-    '<div class="flex gap-2">'+
-    '<div class="flex-1"><label class="block text-xs font-bold mb-1">Dari</label>'+
-    '<select name="ayatFrom" id="hafalanAyatFrom" onchange="onHafalanAyatFromChange(this.value)" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm"><option value="">--</option></select></div>'+
-    '<div class="flex-1"><label class="block text-xs font-bold mb-1">Sampai</label>'+
-    '<select name="ayatTo" id="hafalanAyatTo" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm"><option value="">--</option></select></div></div></div>'+
-    '<div><label class="block text-xs font-bold mb-1">Status</label>'+
-    '<select name="status" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm font-bold">'+
-    '<option value="Lancar">Lancar ✅</option><option value="Tidak Lancar">Tidak Lancar ❌</option></select></div>'+
-    '<div><label class="block text-xs font-bold mb-1">Catatan</label>'+
-    '<textarea name="note" rows="2" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm resize-none" placeholder="Pesan..."></textarea></div>'+
-    '</div>'+
-    '<button type="submit" '+(S.submitting?'disabled':'')+' class="btn-kid w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-3 rounded-xl font-black disabled:opacity-60">💾 Simpan Setoran</button>'+
-    '</form></div>';
 }
 
 // =================================================================
@@ -2232,7 +2385,7 @@ function viewJadwal(){
 }
 
 // =================================================================
-// VIEW: KELOLA REWARD (Admin)
+// VIEW: KELOLA REWARD
 // =================================================================
 function viewAdminReward(){
   let cards='';
@@ -2761,10 +2914,12 @@ function viewAdminRapor(){
   if(S.raporData){
     const r=S.raporData;
     const rankLabel=r.rank===1?'🥇 Juara 1':r.rank===2?'🥈 Juara 2':r.rank===3?'🥉 Juara 3':'#'+r.rank;
-    let hafRows=r.hafalanTerakhir.length===0?'<tr><td colspan="3" class="p-2 text-gray-400 italic text-center text-xs">Belum ada</td></tr>'
+    let hafRows=r.hafalanTerakhir.length===0?'<tr><td colspan="4" class="p-2 text-gray-400 italic text-center text-xs">Belum ada</td></tr>'
     :r.hafalanTerakhir.slice(0,5).map(function(h){
       const detail=h.tipe==='Iqra'?('Iqra '+h.jilid+' h.'+h.halaman):(h.surah+' '+h.ayat);
+      const katBadge=h.kategori==='Hafalan'?'<span class="text-[9px] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">🎯 Hafalan</span>':'<span class="text-[9px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">📖 Bacaan</span>';
       return '<tr class="border-b border-gray-200"><td class="p-1.5 text-[10px]">'+fmtDateShort(h.waktu)+'</td>'+
+        '<td class="p-1.5">'+katBadge+'</td>'+
         '<td class="p-1.5 text-xs">'+esc(detail)+'</td>'+
         '<td class="p-1.5 text-[10px]">'+esc(h.status)+'</td></tr>';
     }).join('');
@@ -2779,11 +2934,15 @@ function viewAdminRapor(){
       '<div class="grid grid-cols-3 gap-2 mb-3">'+
       '<div class="bg-yellow-100 rounded-xl p-2 text-center border-2 border-yellow-300"><div class="text-lg">🎯</div><div class="text-[10px] text-gray-600 font-bold">POIN</div><div class="text-lg font-black text-amber-700">'+r.totalPoinBulan+'</div></div>'+
       '<div class="bg-green-100 rounded-xl p-2 text-center border-2 border-green-300"><div class="text-lg">✅</div><div class="text-[10px] text-gray-600 font-bold">HADIR</div><div class="text-lg font-black text-emerald-700">'+r.hadir+'</div></div>'+
-      '<div class="bg-blue-100 rounded-xl p-2 text-center border-2 border-blue-300"><div class="text-lg">📖</div><div class="text-[10px] text-gray-600 font-bold">SETOR</div><div class="text-lg font-black text-blue-700">'+r.hafalanTerakhir.length+'</div></div>'+
+      '<div class="bg-blue-100 rounded-xl p-2 text-center border-2 border-blue-300"><div class="text-lg">📖</div><div class="text-[10px] text-gray-600 font-bold">SETOR</div><div class="text-lg font-black text-blue-700">'+((r.hafalanBulan||0)+(r.bacaanBulan||0))+'</div></div>'+
+      '</div>'+
+      '<div class="grid grid-cols-2 gap-2 mb-3">'+
+      '<div class="bg-blue-50 rounded-xl p-2 text-center border-2 border-blue-200"><div class="text-xs font-bold text-blue-700">📖 Bacaan Bulan Ini</div><div class="text-xl font-black text-blue-700">'+(r.bacaanBulan||0)+'</div></div>'+
+      '<div class="bg-purple-50 rounded-xl p-2 text-center border-2 border-purple-200"><div class="text-xs font-bold text-purple-700">🎯 Hafalan Bulan Ini</div><div class="text-xl font-black text-purple-700">'+(r.hafalanBulan||0)+'</div></div>'+
       '</div>'+
       '<div class="rounded-2xl border-2 border-emerald-200 overflow-hidden mb-3">'+
       '<div class="bg-emerald-500 text-white p-2 font-bold text-xs">📖 Setoran Terakhir</div>'+
-      '<table class="w-full text-xs"><tbody>'+hafRows+'</tbody></table></div>'+
+      '<table class="w-full text-xs"><thead class="bg-emerald-50"><tr><th class="p-1.5 text-left text-[10px]">Tanggal</th><th class="p-1.5 text-left text-[10px]">Kategori</th><th class="p-1.5 text-left text-[10px]">Detail</th><th class="p-1.5 text-left text-[10px]">Status</th></tr></thead><tbody>'+hafRows+'</tbody></table></div>'+
       '<div class="grid grid-cols-2 gap-4 mt-6 text-center text-xs">'+
       '<div><div class="h-12"></div><div class="border-t-2 border-dashed border-gray-400 pt-1 font-bold">Guru</div></div>'+
       '<div><div class="h-12"></div><div class="border-t-2 border-dashed border-gray-400 pt-1 font-bold">Orang Tua</div></div></div>'+
@@ -3108,6 +3267,7 @@ async function goto(view){
   else if(view==='grafik')await loadGrafik();
   else if(view==='reward')await loadRedemptions();
   else if(view==='poin')await loadPoinHariIni();
+  else if(view==='hafalan'){await loadPoinHariIni();S.hafalanBulkStudents=[];}
   else if(view==='admin_notif')await loadPendingRedemptions();
   else if(view==='admin_usulan')await loadRewardUsulan();
   else if(view==='usul_reward'){await loadRewardUsulan();await loadMyWeeklyRewardStatus();}
@@ -3128,7 +3288,7 @@ if('serviceWorker' in navigator){
 }
 
 // =================================================================
-// AUTO-REFRESH PENDING NOTIF
+// AUTO-REFRESH PENDING
 // =================================================================
 setInterval(function(){
   if(S.user&&S.user.role==='admin'){
