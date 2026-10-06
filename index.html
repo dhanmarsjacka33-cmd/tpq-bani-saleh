@@ -279,8 +279,7 @@ function showToast(msg,type,opts){
 
 function token(){return sessionStorage.getItem('tpq_token')||'';}
 function setToken(t){if(t)sessionStorage.setItem('tpq_token',t);else sessionStorage.removeItem('tpq_token');}
-function saveUser(u){if(u)sessionStorage.setItem('tpq_user',JSON.stringify(u));else sessionStorage.removeItem('tpq_user');}
-
+function saveUserSession(u){if(u)sessionStorage.setItem('tpq_user',JSON.stringify(u));else sessionStorage.removeItem('tpq_user');}
 function fmtDate(iso){try{return new Date(iso).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return iso;}}
 function fmtDateShort(iso){try{return new Date(iso).toLocaleDateString('id-ID');}catch(e){return iso;}}
 function fmtTime(iso){try{return new Date(iso).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});}catch(e){return iso;}}
@@ -563,7 +562,7 @@ async function doLoginAdmin(){
   try{
     const res=await apiLogin('loginAdmin',S.loginUser,S.loginPass);
     setToken(res.token);sessionStorage.removeItem('tpq_user');
-    S.user={role:res.role,data:res.data};saveUser(S.user);
+    S.user={role:res.role,data:res.data};saveUserSession(S.user);
     S.view='dashboard';S.mustChangePin=false;
     await loadData();playConfetti();loadJadwal();
   }catch(err){S.loginError=err.message;}
@@ -574,7 +573,7 @@ async function doLoginSantri(){
   try{
     const res=await apiLogin('loginSantri',parseInt(S.loginStudent,10),S.loginPass);
     setToken(res.token);sessionStorage.removeItem('tpq_user');
-    S.user={role:res.role,data:res.data};saveUser(S.user);
+    S.user={role:res.role,data:res.data};saveUserSession(S.user);
     S.view='dashboard';
     if(res.data&&res.data.mustChangePin){S.mustChangePin=true;S.oldPin=S.loginPass;S.newPin='';S.newPinConfirm='';S.pinError='';}
     else S.mustChangePin=false;
@@ -599,7 +598,7 @@ async function submitForcePinChange(){
     await api('changeSantriPin',S.oldPin,S.newPin);
     S.mustChangePin=false;
     if(S.user&&S.user.data)S.user.data.mustChangePin=false;
-    saveUser(S.user);playDing();playConfetti();
+    saveUserSession(S.user);playDing();playConfetti();
     showToast('PIN berhasil diubah. Selamat datang!','success');
   }catch(err){S.pinError=err.message||'Gagal mengubah PIN';}
   S.pinChanging=false;render();
