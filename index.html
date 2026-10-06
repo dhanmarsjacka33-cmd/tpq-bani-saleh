@@ -296,7 +296,7 @@ function extractYouTubeId(url){
   if(/^[A-Za-z0-9_-]{11}$/.test(url))return url;
   return null;
 }
-
+function matchSetoranGroup(s,filter){if(filter==='semua')return true;if(!s)return false;const k=String(s.kelas||'').toLowerCase();if(filter==='Iqra')return k.indexOf('iqra')!==-1;if(filter==='Al-Quran')return k.indexOf('qur')!==-1;return false;}
 function getKelasList(){const set={};S.students.forEach(function(s){if(s.kelas)set[s.kelas]=true;});S.jadwalList.forEach(function(j){if(j.kelas)set[j.kelas]=true;});return Object.keys(set).sort();}
 function getGuruList(){const set={};S.jadwalList.forEach(function(j){if(j.guru&&String(j.guru).trim())set[String(j.guru).trim()]=true;});return Object.keys(set).sort();}
 function filterByKelas(list){if(!S.kelasFilter)return list;return list.filter(function(x){return x.kelas===S.kelasFilter;});}
