@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#f59e0b">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TPQ Bani Saleh">
 <link rel="manifest" href="./manifest.json">
@@ -53,7 +54,7 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 .btn-kid:active{transform:translateY(1px);border-bottom-width:1px;}
 .btn-kid:disabled{opacity:.45;cursor:not-allowed;}
 
-/* ==== PAGE HEADER (Compact) ==== */
+/* ==== PAGE HEADER ==== */
 .page-header{display:flex;align-items:center;gap:10px;padding:6px 0 12px;margin-bottom:12px;border-bottom:2px solid #fef3c7;}
 .page-header .icon-badge{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#fbbf24,#f97316);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 3px 8px rgba(245,158,11,.3);}
 .page-header h1{font-size:18px;font-weight:800;color:#1f2937;margin:0;line-height:1.2;}
@@ -61,11 +62,12 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 
 /* ==== BOTTOM NAV ==== */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:white;border-top:2px solid #fef3c7;display:flex;justify-content:space-around;align-items:center;height:62px;padding:0 4px;box-shadow:0 -2px 12px rgba(0,0,0,.08);padding-bottom:env(safe-area-inset-bottom);}
-.bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;background:transparent;border:0;font-size:10px;font-weight:700;color:#9ca3af;transition:color .15s,transform .15s;cursor:pointer;font-family:inherit;}
+.bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;background:transparent;border:0;font-size:10px;font-weight:700;color:#9ca3af;transition:color .15s,transform .15s;cursor:pointer;font-family:inherit;position:relative;}
 .bottom-nav button .icon{font-size:22px;line-height:1;}
 .bottom-nav button.active{color:#f59e0b;transform:scale(1.05);}
+.bottom-nav button .notif-dot{position:absolute;top:4px;right:calc(50% - 20px);background:#ef4444;color:#fff;font-size:9px;font-weight:900;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center;border:2px solid white;}
 
-/* ==== STUDENT ROW (Compact) ==== */
+/* ==== STUDENT ROW ==== */
 .student-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:white;border:2px solid #f3f4f6;margin-bottom:6px;cursor:pointer;transition:all .15s;}
 .student-row:active{transform:scale(.99);}
 .student-row.selected{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-color:#3b82f6;box-shadow:0 2px 8px rgba(59,130,246,.2);}
@@ -78,7 +80,7 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 .student-row .points.pos{color:#10b981;}
 .student-row .points.neg{color:#ef4444;}
 
-/* ==== STATUS GROUP (Compact Inline) ==== */
+/* ==== STATUS GROUP ==== */
 .status-group{display:inline-flex;gap:2px;padding:2px;background:#f3f4f6;border-radius:10px;flex-shrink:0;}
 .status-mini{padding:5px 7px;border-radius:7px;font-size:12px;border:0;cursor:pointer;background:transparent;transition:all .15s;line-height:1;font-family:inherit;}
 .status-mini.active-hadir{background:#10b981;}
@@ -107,7 +109,7 @@ h1,h2,h3,.font-head{font-family:'Baloo 2','Fredoka',system-ui,sans-serif;font-we
 #qr-reader{border-radius:16px;overflow:hidden;}
 #qr-reader video{border-radius:16px;}
 
-/* ==== RULE CHECKBOX (untuk sheet) ==== */
+/* ==== RULE CHECKBOX ==== */
 .rule-checkbox{width:20px;height:20px;border-radius:6px;border:2px solid #cbd5e1;background:white;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:transparent;font-size:12px;font-weight:900;}
 
 /* ==== IMAGE THUMB ==== */
@@ -243,10 +245,15 @@ const S={
   studentGroup:'none',
   darkMode:false,
   showShortcutHelp:false,
-  /* ==== BARU ==== */
   drawerOpen:false,
-poinSheetOpen:false,
-poinFilterSetoran:'semua'
+  poinSheetOpen:false,
+  poinFilterSetoran:'semua',
+  pendingRedemptions:[],
+  rewardUsulanList:[],
+  myWeeklyRewardStatus:null,
+  showUsulForm:false,
+  usulRewardNama:'',
+  usulRewardDesc:''
 };
 
 const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -316,7 +323,7 @@ function buildQRUrl(text,size){size=size||300;return 'https://api.qrserver.com/v
 
 function resetStateToLoggedOut(){
   sessionStorage.removeItem('tpq_token');sessionStorage.removeItem('tpq_user');
-  S.user=null;S.view='dashboard';S.loginView='selection';
+  S.user=null;S.error='';S.view='dashboard';S.loginView='selection';
   S.loginUser='';S.loginPass='';S.loginStudent='';S.loginError='';
   S.loading=false;S.grafikLoaded=false;S.santriGrafik=[];S.santriBadges=[];S.riwayatData=[];
   S.selectedStudents=[];S.selectedRules={};S.scanCooldown={};
@@ -327,6 +334,7 @@ function resetStateToLoggedOut(){
   S.absenFilterPoin='semua';S.absenFilterSetoran='semua';
   S.lastUndo=null;S.aksiHariIni=[];
   S.drawerOpen=false;S.poinSheetOpen=false;
+  S.pendingRedemptions=[];S.rewardUsulanList=[];S.myWeeklyRewardStatus=null;
 }
 
 function applyDarkMode(){if(S.darkMode)document.body.classList.add('dark-mode');else document.body.classList.remove('dark-mode');}
@@ -459,6 +467,7 @@ document.addEventListener('click',function(e){
       case 'edit-reward':openEditReward(parseInt(d.id,10));break;
       case 'edit-jadwal':openEditJadwal(parseInt(d.id,10));break;
       case 'edit-badge':openEditBadge(parseInt(d.id,10));break;
+      case 'edit-kuis':openEditKuis(parseInt(d.id,10));break;
       case 'preview-materi':openPreviewMateri(parseInt(d.id,10));break;
       case 'open-kuis-detail':openKuisDetail(parseInt(d.id,10));break;
       case 'delete-rule':deleteRule(parseInt(d.id,10),d.name||'');break;
@@ -496,7 +505,9 @@ document.addEventListener('click',function(e){
       case 'remove-image-editing':removeImageFromEditing(parseInt(d.idx,10));break;
       case 'clear-materi-images':if(S.editingMateri){S.editingMateri.images=[];render();}break;
       case 'remove-reward-image':removeRewardImage();break;
-      case 'do-redeem':doRedeem(parseInt(d.sid,10),parseInt(d.rid,10));break;
+      case 'do-redeem':doRequestReward(parseInt(d.rid,10));break;
+      case 'approve-redemption':doApproveRedemption(d.redid,d.reward,d.name);break;
+      case 'reject-redemption':doRejectRedemption(d.redid,d.reward,d.name);break;
       case 'start-scanner':startScanner();break;
       case 'stop-scanner':stopScanner();break;
       case 'load-kehadiran':loadKehadiran();break;
@@ -521,14 +532,22 @@ document.addEventListener('click',function(e){
       case 'set-group':S.studentGroup=d.group;render();break;
       case 'do-undo':doUndo();break;
       case 'dismiss-undo':S.lastUndo=null;render();break;
+      case 'open-usul-form':openUsulForm();break;
+      case 'close-usul-form':closeUsulForm();break;
+      case 'submit-usul-reward':doUsulkanReward();break;
+      case 'vote-reward':doVoteReward(d.id,d.nama);break;
+      case 'close-usulan':doCloseUsulan(d.id,d.nama);break;
+      case 'promote-usulan':promoteUsulanToReward(d.id);break;
     }
   }catch(err){console.error('Action error:',action,err);showToast('Terjadi kesalahan: '+err.message,'error');}
-}, true);
+},true);
+
 document.addEventListener('keydown',function(e){
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
   if(e.key==='Escape'){
     if(S.drawerOpen){S.drawerOpen=false;render();e.preventDefault();}
     else if(S.poinSheetOpen){S.poinSheetOpen=false;render();e.preventDefault();}
+    else if(S.showUsulForm){S.showUsulForm=false;render();e.preventDefault();}
     else if(S.showPreviewPoin){S.showPreviewPoin=false;render();e.preventDefault();}
     else if(S.editingRule){S.editingRule=null;render();e.preventDefault();}
     else if(S.editingMateri){S.editingMateri=null;render();e.preventDefault();}
@@ -540,7 +559,8 @@ document.addEventListener('keydown',function(e){
 // =================================================================
 // LOADERS
 // =================================================================
-async function loadData(){if(!token())return;try{const data=await api('getInitialData');S.students=data.students||[];S.rules=data.pointRules||[];S.materials=data.materials||[];S.rewards=data.rewards||[];S.badges=data.badges||[];}catch(err){S.error=err.message;}}async function loadJadwal(){try{S.jadwalList=await api('getJadwal',S.jadwalKelas);}catch(e){S.jadwalList=[];}}
+async function loadData(){if(!token())return;try{const data=await api('getInitialData');S.students=data.students||[];S.rules=data.pointRules||[];S.materials=data.materials||[];S.rewards=data.rewards||[];S.badges=data.badges||[];}catch(err){const m=(err.message||'');if(m.indexOf('Sesi')!==-1||m.indexOf('login ulang')!==-1||m.indexOf('Akses ditolak')!==-1)return;S.error=m;}}
+async function loadJadwal(){try{S.jadwalList=await api('getJadwal',S.jadwalKelas);}catch(e){S.jadwalList=[];}}
 async function loadUsers(){try{S.usersList=await api('getUsers');}catch(e){S.usersList=[];}}
 async function loadKuis(){try{S.kuisList=await api('getKuisList');}catch(e){S.kuisList=[];}}
 async function loadEvaluasi(){try{S.evaluasiList=await api('getEvaluasiList');}catch(e){S.evaluasiList=[];}}
@@ -553,6 +573,9 @@ async function loadArsipList(){try{S.arsipPeriodes=await api('getListPeriodeArsi
 async function loadRapor(){if(!S.raporStudent)return showToast('Pilih santri terlebih dahulu!','warn');S.loading=true;render();try{S.raporData=await api('getRaporSantri',parseInt(S.raporStudent,10),S.raporBulan,S.raporTahun);}catch(err){showToast('Gagal: '+err.message,'error');}S.loading=false;render();}
 async function loadAbsenData(){try{const existing=await api('getAttendanceByDate',S.absenTanggal);S.absenExisting=existing;const map={};existing.forEach(function(e){map[e.studentId]={status:e.status,keterangan:e.keterangan||''};});S.absenData=map;}catch(e){S.absenData={};S.absenExisting=[];}}
 async function loadPoinHariIni(){S.loadingPoinHariIni=true;try{const[poin,groups]=await Promise.all([api('getPoinHariIni',S.absenTanggal),api('getSetoranGroupMap')]);S.poinHariIni=poin||{};S.setoranGroupMap=groups||{};}catch(e){S.poinHariIni={};S.setoranGroupMap={};}S.loadingPoinHariIni=false;}
+async function loadPendingRedemptions(){try{S.pendingRedemptions=await api('getPendingRedemptions');}catch(e){S.pendingRedemptions=[];}}
+async function loadRewardUsulan(){try{S.rewardUsulanList=await api('getRewardUsulanList');}catch(e){S.rewardUsulanList=[];}}
+async function loadMyWeeklyRewardStatus(){try{S.myWeeklyRewardStatus=await api('getMyWeeklyRewardStatus');}catch(e){S.myWeeklyRewardStatus=null;}}
 
 // =================================================================
 // LOGIN
@@ -564,7 +587,8 @@ async function doLoginAdmin(){
     setToken(res.token);sessionStorage.removeItem('tpq_user');
     S.user={role:res.role,data:res.data};saveUserSession(S.user);
     S.view='dashboard';S.mustChangePin=false;
-    await loadData();playConfetti();loadJadwal();
+    await loadData();playConfetti();
+    Promise.all([loadJadwal(),loadPendingRedemptions(),loadRewardUsulan()]).catch(function(){});
   }catch(err){S.loginError=err.message;}
   S.isLoggingIn=false;render();
 }
@@ -578,7 +602,7 @@ async function doLoginSantri(){
     if(res.data&&res.data.mustChangePin){S.mustChangePin=true;S.oldPin=S.loginPass;S.newPin='';S.newPinConfirm='';S.pinError='';}
     else S.mustChangePin=false;
     await loadData();playConfetti();
-    Promise.all([loadJadwal(),loadSantriBadges(),loadGrafik()]).catch(function(){});
+    Promise.all([loadJadwal(),loadSantriBadges(),loadGrafik(),loadRewardUsulan(),loadMyWeeklyRewardStatus()]).catch(function(){});
   }catch(err){S.loginError=err.message;}
   S.isLoggingIn=false;render();
 }
@@ -608,6 +632,7 @@ async function forceLogout(){
   try{await apiLogin('logoutUser',token());}catch(e){}
   resetStateToLoggedOut();render();
 }
+
 // =================================================================
 // POINT ACTIONS
 // =================================================================
@@ -672,7 +697,7 @@ async function submitCustom(e){
     const res=await api('saveCustomPoints',idsCopy,amt,S.customNote);
     playDing();playConfetti();
     S.lastUndo={ids:idsCopy,points:amt,label:'Custom '+amt,expiresAt:Date.now()+60000};
-    addAksi((amt>0?'+':'')+amt+' poin ke '+res.updated+' santri (custom)',res.updated,amt);
+    addAksi((amt>0?'+':'')+amt+' poin ke '+res.updated+' santri',res.updated,amt);
     showToast('✅ '+res.updated+' santri diperbarui','success',{undo:true,ttl:8000});
     S.customAmount='';S.customNote='';S.selectedStudents=[];
     await loadData();await loadPoinHariIni();
@@ -770,7 +795,7 @@ function setAllAbsen(status){
   if(S.absenKelasFilter)list=list.filter(function(s){return s.kelas===S.absenKelasFilter;});
   if(S.absenFilterPoin==='belum')list=list.filter(function(s){return!S.poinHariIni[s.id];});
   else if(S.absenFilterPoin==='sudah')list=list.filter(function(s){return!!S.poinHariIni[s.id];});
-    if(S.absenFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.absenFilterSetoran);});
+  if(S.absenFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.absenFilterSetoran);});
   list.forEach(function(s){if(!S.absenData[s.id])S.absenData[s.id]={status:status,keterangan:''};else S.absenData[s.id].status=status;});
   render();
 }
@@ -907,7 +932,7 @@ function nextLightbox(){if(!S.lightboxImages)return;S.lightboxIndex=(S.lightboxI
 function prevLightbox(){if(!S.lightboxImages)return;S.lightboxIndex=(S.lightboxIndex-1+S.lightboxImages.length)%S.lightboxImages.length;render();}
 
 // =================================================================
-// REWARDS
+// REWARDS CRUD
 // =================================================================
 function openAddReward(){S.editingReward={id:null,nama:'',deskripsi:'',biaya:20,stok:10,images:[]};S.uploadingImages=false;S.uploadProgress='';render();}
 function openEditReward(id){const r=S.rewards.find(function(x){return x.id===id;});if(r)S.editingReward={id:r.id,nama:r.nama,deskripsi:r.deskripsi,biaya:r.biaya,stok:r.stok,images:(r.images||[]).slice()};S.uploadingImages=false;S.uploadProgress='';render();}
@@ -945,20 +970,96 @@ async function saveReward(e){
   S.submitting=false;render();
 }
 async function deleteReward(id,nama){if(!confirm('Hapus reward "'+nama+'"?'))return;try{await api('deleteReward',id);await loadData();showToast('Reward dihapus','success');}catch(err){showToast('Gagal: '+err.message,'error');}render();}
-async function doRedeem(studentId,rewardId){
-  if(!confirm('Tukar reward ini dengan poin santri?'))return;
+
+// =================================================================
+// REDEMPTION (request reward)
+// =================================================================
+async function doRequestReward(rewardId){
+  if(!confirm('Kirim permintaan reward ini ke admin?'))return;
   S.submitting=true;render();
   try{
-    const res=await api('redeemReward',studentId,rewardId);
-    playDing();playConfetti();showToast('✅ Berhasil ditukar! Sisa poin: '+res.sisaPoin,'success');
+    const res=await api('requestReward',rewardId);
+    playDing();playConfetti();
+    showToast('✅ Request terkirim! Menunggu persetujuan admin.','success');
+    await loadRedemptions();
+  }catch(err){showToast('Gagal: '+err.message,'error');}
+  S.submitting=false;render();
+}
+async function doApproveRedemption(redemptionId,rewardName,studentName){
+  if(!confirm('Setujui pemberian "'+rewardName+'" untuk '+studentName+'?'))return;
+  S.submitting=true;render();
+  try{
+    const res=await api('approveRedemption',redemptionId);
+    playDing();playConfetti();
+    showToast('✅ Reward diberikan. Sisa poin: '+res.sisaPoin,'success');
+    await loadPendingRedemptions();
     await loadData();
-    if(S.user.role==='santri')S.user.data.points=res.sisaPoin;
+    await loadRedemptions();
+  }catch(err){showToast('Gagal: '+err.message,'error');}
+  S.submitting=false;render();
+}
+async function doRejectRedemption(redemptionId,rewardName,studentName){
+  const alasan=prompt('Alasan menolak "'+rewardName+'" untuk '+studentName+'?\n(opsional)','Stok habis / poin tidak cukup');
+  if(alasan===null)return;
+  S.submitting=true;render();
+  try{
+    await api('rejectRedemption',redemptionId,alasan);
+    showToast('Request ditolak','info');
+    await loadPendingRedemptions();
+    await loadRedemptions();
   }catch(err){showToast('Gagal: '+err.message,'error');}
   S.submitting=false;render();
 }
 
 // =================================================================
-// JADWAL
+// USUL REWARD ACTIONS
+// =================================================================
+function openUsulForm(){S.showUsulForm=true;S.usulRewardNama='';S.usulRewardDesc='';render();}
+function closeUsulForm(){S.showUsulForm=false;render();}
+async function doUsulkanReward(){
+  if(!S.usulRewardNama||!S.usulRewardNama.trim())return showToast('Isi nama reward!','warn');
+  S.submitting=true;render();
+  try{
+    const res=await api('usulkanReward',S.usulRewardNama.trim(),S.usulRewardDesc.trim());
+    playDing();playConfetti();
+    showToast('✅ Usulan terkirim! Vote: '+res.voteCount,'success');
+    S.usulRewardNama='';S.usulRewardDesc='';S.showUsulForm=false;
+    await loadRewardUsulan();await loadMyWeeklyRewardStatus();
+  }catch(err){showToast('Gagal: '+err.message,'error');}
+  S.submitting=false;render();
+}
+async function doVoteReward(usulanId,nama){
+  if(!confirm('Vote untuk "'+nama+'"?'))return;
+  S.submitting=true;render();
+  try{
+    const res=await api('voteReward',usulanId);
+    playDing();playConfetti();
+    showToast('👍 Vote berhasil! Total: '+res.voteCount,'success');
+    await loadRewardUsulan();await loadMyWeeklyRewardStatus();
+  }catch(err){showToast('Gagal: '+err.message,'error');}
+  S.submitting=false;render();
+}
+async function doCloseUsulan(usulanId,nama){
+  if(!confirm('Tutup usulan "'+nama+'"? Tidak muncul lagi di daftar santri.'))return;
+  S.submitting=true;render();
+  try{
+    await api('closeRewardUsulan',usulanId);
+    showToast('Usulan ditutup','success');
+    await loadRewardUsulan();
+  }catch(err){showToast('Gagal: '+err.message,'error');}
+  S.submitting=false;render();
+}
+function promoteUsulanToReward(id){
+  const u=S.rewardUsulanList.find(function(x){return x.id===id;});
+  if(!u)return showToast('Usulan tidak ditemukan','warn');
+  openAddReward();
+  S.editingReward.nama=u.nama;
+  S.editingReward.deskripsi=u.deskripsi||('Diusulkan oleh '+u.pengusulNama+' ('+u.voteCount+' vote)');
+  render();
+}
+
+// =================================================================
+// JADWAL CRUD
 // =================================================================
 function openAddJadwal(){S.editingJadwal={id:null,kelas:S.jadwalKelas||getKelasList()[0]||'Kelas A',hari:'Senin',jam:'',mapel:'',guru:''};render();}
 function openEditJadwal(id){const j=S.jadwalList.find(function(x){return x.id===id;});if(j)S.editingJadwal={id:j.id,kelas:j.kelas,hari:j.hari,jam:j.jam,mapel:j.mapel,guru:j.guru};render();}
@@ -976,7 +1077,7 @@ async function saveJadwal(e){
 async function deleteJadwal(id){if(!confirm('Hapus jadwal ini?'))return;try{await api('deleteJadwal',id);await loadJadwal();showToast('Jadwal dihapus','success');}catch(err){showToast('Gagal: '+err.message,'error');}render();}
 
 // =================================================================
-// USERS
+// USERS CRUD
 // =================================================================
 function openAddUser(){S.editingUser={username:'',password:'',nama:'',role:'admin',kelas:''};render();}
 function closeUserModal(){S.editingUser=null;render();}
@@ -1005,9 +1106,20 @@ async function doManualBackup(){
 }
 
 // =================================================================
-// KUIS
+// KUIS CRUD
 // =================================================================
-function openAddKuis(){S.editingKuis={id:null,judul:'',deskripsi:'',kelas:'',soal:[]};render();}
+function openAddKuis(){S.editingKuis={id:null,judul:'',deskripsi:'',kelas:'',maxPoin:0,soal:[]};render();}
+function openEditKuis(id){
+  const k=S.kuisList.find(function(x){return x.id===id;});
+  if(!k)return showToast('Kuis tidak ditemukan','warn');
+  api('getKuisDetail',id).then(function(detail){
+    S.editingKuis={
+      id:k.id,judul:k.judul,deskripsi:k.deskripsi||'',kelas:k.kelas||'',maxPoin:k.maxPoin||0,
+      soal:(detail.soal||[]).map(function(s){return{pertanyaan:s.pertanyaan,pilihan:s.pilihan,jawaban:s.jawaban};})
+    };
+    render();
+  }).catch(function(err){showToast('Gagal load: '+err.message,'error');});
+}
 function closeKuisModal(){S.editingKuis=null;render();}
 function addSoalKuis(){if(!S.editingKuis)return;S.editingKuis.soal.push({pertanyaan:'',pilihan:['','','',''],jawaban:0});render();}
 function removeSoalKuis(idx){if(!S.editingKuis)return;S.editingKuis.soal.splice(idx,1);render();}
@@ -1015,8 +1127,13 @@ async function saveKuis(e){
   e.preventDefault();const ed=S.editingKuis;if(!ed)return;
   if(ed.soal.length===0)return showToast('Tambahkan minimal 1 soal!','warn');
   S.submitting=true;render();
-  try{await api('addKuis',{judul:ed.judul,deskripsi:ed.deskripsi,kelas:ed.kelas,soal:ed.soal});S.editingKuis=null;await loadKuis();showToast('Kuis tersimpan','success');}
-  catch(err){showToast('Gagal: '+err.message,'error');}
+  const payload={judul:ed.judul,deskripsi:ed.deskripsi,kelas:ed.kelas,maxPoin:parseInt(ed.maxPoin,10)||0,soal:ed.soal};
+  try{
+    if(ed.id)await api('updateKuis',ed.id,payload);
+    else await api('addKuis',payload);
+    S.editingKuis=null;await loadKuis();
+    showToast(ed.id?'Kuis diperbarui':'Kuis tersimpan','success');
+  }catch(err){showToast('Gagal: '+err.message,'error');}
   S.submitting=false;render();
 }
 async function deleteKuis(id){if(!confirm('Hapus kuis ini?'))return;try{await api('deleteKuis',id);await loadKuis();showToast('Kuis dihapus','success');}catch(err){showToast('Gagal: '+err.message,'error');}render();}
@@ -1030,14 +1147,18 @@ async function submitKuisJawaban(){
   S.submitting=true;render();
   try{
     const res=await api('submitKuis',S.kuisDetail.id,jawabanArr);
-    playDing();playConfetti();showToast('Skor kamu: '+res.skor+' ('+res.benar+'/'+res.total+')','success');
-    S.kuisDetail=null;S.kuisJawaban={};await loadData();
+    playDing();playConfetti();
+    let msg='Skor: '+res.skor+' ('+res.benar+'/'+res.total+')';
+    if(res.poinDidapat>0)msg+=' · +'+res.poinDidapat+' poin 🎉';
+    showToast(msg,'success');
+    S.kuisDetail=null;S.kuisJawaban={};
+    await loadData();
   }catch(err){showToast('Gagal: '+err.message,'error');}
   S.submitting=false;render();
 }
 
 // =================================================================
-// BADGE
+// BADGE CRUD
 // =================================================================
 function openAddBadge(){S.editingBadge={id:null,nama:'',deskripsi:'',icon:'star',syarat_tipe:'poin',syarat_nilai:10};render();}
 function openEditBadge(id){const b=S.badges.find(function(x){return x.id===id;});if(b)S.editingBadge={id:b.id,nama:b.nama,deskripsi:b.deskripsi,icon:b.icon,syarat_tipe:b.syarat_tipe,syarat_nilai:b.syarat_nilai};render();}
@@ -1055,7 +1176,7 @@ async function saveBadge(e){
 async function deleteBadge(id,nama){if(!confirm('Hapus badge "'+nama+'"?'))return;try{await api('deleteBadge',id);await loadData();showToast('Badge dihapus','success');}catch(err){showToast('Gagal: '+err.message,'error');}render();}
 
 // =================================================================
-// EVALUASI
+// EVALUASI ACTIONS
 // =================================================================
 function onGuruSelectChange(v){
   const wrap=document.getElementById('evaluasiGuruManual');
@@ -1080,7 +1201,7 @@ async function submitEvaluasiForm(e){
 }
 
 // =================================================================
-// QR & SCANNER
+// QR SCANNER
 // =================================================================
 function showQRCard(studentId,name){
   S.printStudent={id:studentId,name:name,qrUrl:buildQRUrl(studentId,400),qrLoading:true};render();
@@ -1123,6 +1244,9 @@ async function startScanner(){
 }
 async function stopScanner(){try{if(S.scannerInstance){await S.scannerInstance.stop();S.scannerInstance.clear();S.scannerInstance=null;}}catch(e){}S.scannerActive=false;render();}
 
+// =================================================================
+// HELPERS FORM
+// =================================================================
 function restoreFocus(id,selStart,selEnd){
   if(!id)return;
   setTimeout(function(){
@@ -1138,7 +1262,7 @@ function onHafalanAyatFromChange(v){const toSel=document.getElementById('hafalan
 function toggleDarkMode(){S.darkMode=!S.darkMode;try{localStorage.setItem('tpq_dark',S.darkMode?'1':'0');}catch(e){}applyDarkMode();render();}
 
 // =================================================================
-// RENDER MAIN (with scroll preservation)
+// RENDER MAIN
 // =================================================================
 function render(opts){
   opts=opts||{};
@@ -1189,7 +1313,7 @@ function render(opts){
 async function retry(){S.loading=true;S.error='';render();await loadData();S.loading=false;render();}
 
 // =================================================================
-// NAV: Header Compact + Bottom Nav + Drawer
+// NAV + DRAWER
 // =================================================================
 function renderNav(){
   const isAdmin=S.user.role==='admin';
@@ -1217,8 +1341,10 @@ function renderNav(){
       {v:'kelola_materi',l:'Materi',i:'📚',g:'Kelola'},
       {v:'jadwal',l:'Jadwal',i:'📅',g:'Kelola'},
       {v:'reward',l:'Reward',i:'🎁',g:'Kelola'},
+      {v:'admin_usulan',l:'Usulan Reward',i:'📊',g:'Kelola'},
       {v:'badge',l:'Badge',i:'🏅',g:'Kelola'},
       {v:'kuis',l:'Kuis',i:'❓',g:'Kelola'},
+      {v:'admin_notif',l:'Notifikasi',i:'🔔',g:'Laporan'},
       {v:'terbaik',l:'Terbaik',i:'🏆',g:'Laporan'},
       {v:'riwayat',l:'Riwayat Poin',i:'📋',g:'Laporan'},
       {v:'rapor',l:'Rapor',i:'📝',g:'Laporan'},
@@ -1232,6 +1358,7 @@ function renderNav(){
       {v:'mutabaah',l:'Mutabaah',i:'✅',g:'Utama'},
       {v:'materi',l:'Materi',i:'📚',g:'Utama'},
       {v:'reward',l:'Reward',i:'🎁',g:'Utama'},
+      {v:'usul_reward',l:'Usul Reward',i:'💡',g:'Utama'},
       {v:'jadwal',l:'Jadwal',i:'📅',g:'Belajar'},
       {v:'badge_saya',l:'Badge Saya',i:'🏅',g:'Belajar'},
       {v:'kuis_santri',l:'Kuis',i:'❓',g:'Belajar'},
@@ -1270,7 +1397,11 @@ function renderNav(){
     bottomNav+='<button data-action="goto" data-view="'+it.v+'" class="'+(active?'active':'')+'">'+
       '<span class="icon">'+it.i+'</span><span>'+it.l+'</span></button>';
   });
-  bottomNav+='<button data-action="open-drawer" class=""><span class="icon">☰</span><span>Menu</span></button>';
+  let notifBadge='';
+  if(isAdmin&&S.pendingRedemptions&&S.pendingRedemptions.length>0){
+    notifBadge='<span class="notif-dot">'+S.pendingRedemptions.length+'</span>';
+  }
+  bottomNav+='<button data-action="open-drawer" class="">'+notifBadge+'<span class="icon">☰</span><span>Menu</span></button>';
   bottomNav+='</nav>';
 
   return header+bottomNav+renderDrawer(allMenu);
@@ -1286,10 +1417,13 @@ function renderDrawer(allMenu){
       '<div class="grid grid-cols-2 gap-2">';
     groups[g].forEach(function(m){
       const active=S.view===m.v;
+      const isNotif=m.v==='admin_notif';
+      const badge=isNotif&&S.pendingRedemptions&&S.pendingRedemptions.length>0
+        ?'<span class="ml-auto bg-red-500 text-white text-[9px] font-black px-1.5 rounded-full">'+S.pendingRedemptions.length+'</span>':'';
       content+='<button data-action="goto" data-view="'+m.v+'" class="flex items-center gap-2 p-3 rounded-2xl text-left '+
         (active?'bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow':'bg-gray-50 hover:bg-gray-100')+'">'+
         '<span class="text-xl">'+m.i+'</span>'+
-        '<span class="font-bold text-xs">'+m.l+'</span></button>';
+        '<span class="font-bold text-xs flex-1">'+m.l+'</span>'+badge+'</button>';
     });
     content+='</div></div>';
   });
@@ -1403,7 +1537,7 @@ function renderLightbox(){
 }
 
 // =================================================================
-// FORCE PIN CHANGE
+// FORCE PIN
 // =================================================================
 function renderForcePinChange(){
   return '<div class="min-h-screen flex items-center justify-center p-4" style="background:linear-gradient(135deg,#fef3c7 0%,#fce7f3 50%,#e0e7ff 100%);">'+
@@ -1418,12 +1552,12 @@ function renderForcePinChange(){
     '<input id="forceOldPin" type="password" value="'+esc(S.oldPin)+'" oninput="S.oldPin=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-3 text-center text-lg tracking-widest" maxlength="6" placeholder="PIN Lama" />'+
     '<input id="forceNewPin" type="password" value="'+esc(S.newPin)+'" oninput="S.newPin=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-3 text-center text-lg tracking-widest" maxlength="6" placeholder="PIN Baru" />'+
     '<input id="forceNewPinConfirm" type="password" value="'+esc(S.newPinConfirm)+'" oninput="S.newPinConfirm=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-3 text-center text-lg tracking-widest" maxlength="6" placeholder="Ulangi PIN" />'+
-    '<button data-action="change-pin-submit" '+(S.pinChanging?'disabled':'')+' class="btn-kid w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-3 disabled:opacity-60 font-bold">'+(S.pinChanging?'Menyimpan...':'🔒 Simpan PIN')+'</button>'+
+    '<button onclick="submitForcePinChange()" '+(S.pinChanging?'disabled':'')+' class="btn-kid w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white py-3 disabled:opacity-60 font-bold">'+(S.pinChanging?'Menyimpan...':'🔒 Simpan PIN')+'</button>'+
     '<button onclick="forceLogout()" class="w-full text-gray-500 font-bold py-2 text-xs">← Keluar</button></div></div></div>';
 }
 
 // =================================================================
-// LOGIN SCREEN
+// LOGIN
 // =================================================================
 function renderLogin(){
   let inner='';
@@ -1462,7 +1596,7 @@ function renderLogin(){
 function setLoginView(v){S.loginView=v;S.loginError='';render();}
 
 // =================================================================
-// ROUTER VIEW
+// ROUTER
 // =================================================================
 function renderView(){
   if(S.user.role==='admin'){
@@ -1475,6 +1609,8 @@ function renderView(){
       case 'kelola_materi':return viewAdminKelolaMateri();
       case 'jadwal':return viewJadwal();
       case 'reward':return viewAdminReward();
+      case 'admin_usulan':return viewAdminUsulanReward();
+      case 'admin_notif':return viewAdminNotifikasi();
       case 'badge':return viewAdminBadge();
       case 'kuis':return viewAdminKuis();
       case 'users':return viewAdminUsers();
@@ -1493,6 +1629,7 @@ function renderView(){
     case 'materi':return viewMateri();
     case 'jadwal':return viewJadwal();
     case 'reward':return viewSantriReward();
+    case 'usul_reward':return viewSantriUsulReward();
     case 'badge_saya':return viewSantriBadges();
     case 'kuis_santri':return viewSantriKuis();
     case 'grafik':return viewSantriGrafik();
@@ -1503,14 +1640,14 @@ function renderView(){
 }
 
 // =================================================================
-// VIEW: KEHADIRAN INPUT (Compact)
+// VIEW: ABSEN & POIN (Admin)
 // =================================================================
 function viewKehadiranInput(){
   let list=S.students;
   if(S.absenKelasFilter)list=list.filter(function(s){return s.kelas===S.absenKelasFilter;});
   if(S.absenFilterPoin==='belum')list=list.filter(function(s){return!S.poinHariIni[s.id];});
   else if(S.absenFilterPoin==='sudah')list=list.filter(function(s){return!!S.poinHariIni[s.id];});
-    if(S.absenFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.absenFilterSetoran);});
+  if(S.absenFilterSetoran!=='semua')list=list.filter(function(s){return matchSetoranGroup(s,S.absenFilterSetoran);});
 
   const kelasList=getKelasList();
   let kelasOpts='<option value="">Semua</option>';
@@ -1538,7 +1675,7 @@ function viewKehadiranInput(){
     });
     const poinBadge=sudah?'<span class="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded">'+(sudah.total>0?'+':'')+sudah.total+'</span>':'';
     const groupTag=group?'<span class="text-[10px] font-bold '+(group.tipe==='Iqra'?'text-amber-600':'text-blue-600')+'">'+esc(group.detail)+'</span>':'';
-    rows+='<div class="student-row '+(status==='Hadir'?'':'')+'">'+
+    rows+='<div class="student-row">'+
       '<div class="info">'+
       '<div class="name">'+esc(s.name)+'</div>'+
       '<div class="meta">'+esc(s.kelas)+' · '+s.points+' poin '+groupTag+' '+poinBadge+'</div>'+
@@ -1597,7 +1734,7 @@ function viewKehadiranInput(){
 }
 
 // =================================================================
-// VIEW: INPUT POIN (Sheet-based Compact)
+// VIEW: INPUT POIN
 // =================================================================
 function viewAdminPoin(){
   let chipsHtml='';
@@ -1693,14 +1830,14 @@ function viewAdminPoin(){
     '<option value="points" '+(S.studentSort==='points'?'selected':'')+'>Poin</option>'+
     '<option value="kelas" '+(S.studentSort==='kelas'?'selected':'')+'>Kelas</option>'+
     '</select></div>'+
-'<div class="flex flex-wrap gap-1.5 mb-2">'+
-'<span class="text-[10px] font-bold text-gray-500 self-center">Setoran:</span>'+
-'<button data-action="set-poin-filter-setoran" data-filter="semua" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='semua'?'bg-purple-500 text-white':'bg-gray-100 text-gray-600')+'">📚 Semua</button>'+
-'<button data-action="set-poin-filter-setoran" data-filter="Iqra" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='Iqra'?'bg-amber-500 text-white':'bg-gray-100 text-gray-600')+'">🟡 Iqra</button>'+
-'<button data-action="set-poin-filter-setoran" data-filter="Al-Quran" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='Al-Quran'?'bg-blue-500 text-white':'bg-gray-100 text-gray-600')+'">🔵 Al-Quran</button>'+
-'</div>'+
-'<div class="flex flex-wrap gap-1.5 mb-3">'+
-'<button data-action="select-hadir-hari-ini" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold">✅ Hadir hari ini</button>'+
+    '<div class="flex flex-wrap gap-1.5 mb-2">'+
+    '<span class="text-[10px] font-bold text-gray-500 self-center">Setoran:</span>'+
+    '<button data-action="set-poin-filter-setoran" data-filter="semua" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='semua'?'bg-purple-500 text-white':'bg-gray-100 text-gray-600')+'">📚 Semua</button>'+
+    '<button data-action="set-poin-filter-setoran" data-filter="Iqra" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='Iqra'?'bg-amber-500 text-white':'bg-gray-100 text-gray-600')+'">🟡 Iqra</button>'+
+    '<button data-action="set-poin-filter-setoran" data-filter="Al-Quran" class="px-2.5 py-1 rounded-full text-[11px] font-bold '+(S.poinFilterSetoran==='Al-Quran'?'bg-blue-500 text-white':'bg-gray-100 text-gray-600')+'">🔵 Al-Quran</button>'+
+    '</div>'+
+    '<div class="flex flex-wrap gap-1.5 mb-3">'+
+    '<button data-action="select-hadir-hari-ini" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold">✅ Hadir hari ini</button>'+
     '<button data-action="select-all-filtered" class="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-[11px] font-bold">☑️ Pilih semua</button>'+
     '</div>'+
     '<div class="space-y-1.5">'+rows+'</div>'+
@@ -1713,7 +1850,7 @@ function viewAdminPoin(){
 }
 
 // =================================================================
-// VIEW: ADMIN DASHBOARD (Minimal)
+// VIEW: DASHBOARD ADMIN
 // =================================================================
 function viewAdminDashboard(){
   const totalSantri=S.students.length;
@@ -1754,6 +1891,11 @@ function viewAdminDashboard(){
     '<div class="font-black text-sm">Rapor</div>'+
     '<div class="text-[10px] opacity-80">Cetak & laporan</div></button>'+
     '</div>'+
+    (S.pendingRedemptions&&S.pendingRedemptions.length>0?'<button data-action="goto" data-view="admin_notif" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl p-3 mb-3 flex items-center gap-2 text-left">'+
+      '<div class="text-2xl">🔔</div>'+
+      '<div class="flex-1"><div class="font-black text-sm">'+S.pendingRedemptions.length+' Request Reward</div>'+
+      '<div class="text-[10px] opacity-90">Menunggu persetujuan Anda</div></div>'+
+      '<div class="text-xl">→</div></button>':'')+
     '<div class="card-kid bg-white p-4">'+
     '<div class="flex items-center justify-between mb-2">'+
     '<h3 class="font-black text-base">🏆 Top 5 Santri</h3>'+
@@ -1803,7 +1945,7 @@ function viewAdminAbsensi(){
 }
 
 // =================================================================
-// VIEW: KELOLA POIN
+// VIEW: KELOLA ATURAN POIN
 // =================================================================
 function viewAdminKelolaPoin(){
   const pos=S.rules.filter(function(r){return r.points>=0;}).sort(function(a,b){return a.points-b.points;});
@@ -1853,7 +1995,7 @@ function viewAdminKelolaPoin(){
 }
 
 // =================================================================
-// VIEW: HAFALAN
+// VIEW: SETORAN HAFALAN
 // =================================================================
 function viewAdminHafalan(){
   let opts='<option value="">-- Pilih Santri --</option>';
@@ -1901,7 +2043,7 @@ function viewAdminHafalan(){
 }
 
 // =================================================================
-// VIEW: KELOLA MATERI (Admin)
+// VIEW: KELOLA MATERI
 // =================================================================
 function viewAdminKelolaMateri(){
   const TYPES=[{v:'text',l:'Teks',i:'📄'},{v:'image',l:'Gambar',i:'🖼️'},{v:'pdf',l:'PDF',i:'📕'},{v:'video',l:'Video',i:'🎥'},{v:'audio',l:'Audio',i:'🎵'},{v:'link',l:'Link',i:'🔗'}];
@@ -2090,7 +2232,7 @@ function viewJadwal(){
 }
 
 // =================================================================
-// VIEW: REWARD (Admin)
+// VIEW: KELOLA REWARD (Admin)
 // =================================================================
 function viewAdminReward(){
   let cards='';
@@ -2161,17 +2303,176 @@ function viewSantriReward(){
       '<div class="flex items-center justify-between mt-2 pt-2 border-t-2 border-amber-200 text-xs">'+
       '<div class="text-amber-700 font-bold">'+r.biaya+' poin</div>'+
       '<div class="text-[10px] bg-white px-1.5 py-0.5 rounded-full font-bold">Stok: '+r.stok+'</div></div>'+
-      '<button data-action="do-redeem" data-sid="'+S.user.data.id+'" data-rid="'+r.id+'" '+(bisa?'':'disabled')+' class="btn-kid mt-2 w-full '+(bisa?'bg-green-500 text-white':'bg-gray-300 text-gray-500')+' py-2 text-xs rounded-xl">'+(bisa?'Tukar':(r.stok<=0?'Habis':'Belum Cukup'))+'</button></div>';
+      '<button data-action="do-redeem" data-rid="'+r.id+'" '+(bisa?'':'disabled')+' class="btn-kid mt-2 w-full '+(bisa?'bg-gradient-to-r from-pink-500 to-rose-500 text-white':'bg-gray-300 text-gray-500')+' py-2 text-xs rounded-xl">'+(bisa?'🎁 Minta Reward':(r.stok<=0?'Stok Habis':'Poin Belum Cukup'))+'</button></div>';
   });
   return '<div class="fade-in">'+
     '<div class="page-header">'+
     '<div class="icon-badge">🎁</div>'+
     '<div class="flex-1"><h1>Toko Reward</h1><div class="sub">Poin kamu: '+S.user.data.points+'</div></div></div>'+
+    '<div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-3 mb-3 text-xs text-blue-800">💡 Klik <b>Minta Reward</b> untuk mengirim permintaan ke admin. Poin dipotong setelah admin menyetujui.</div>'+
     '<div class="grid grid-cols-2 gap-3">'+(cards||'<p class="text-center text-gray-400 col-span-full py-6 text-xs">Belum ada reward.</p>')+'</div></div>';
 }
 
 // =================================================================
-// VIEW: BADGE (Admin)
+// VIEW: ADMIN NOTIFIKASI
+// =================================================================
+function viewAdminNotifikasi(){
+  const list=S.pendingRedemptions||[];
+  let cards='';
+  if(list.length===0){
+    cards='<div class="card-kid bg-white p-8 text-center">'+
+      '<div class="text-5xl mb-2">📭</div>'+
+      '<p class="text-gray-500 font-bold text-sm">Tidak ada request</p>'+
+      '<p class="text-gray-400 text-xs mt-1">Request reward dari santri akan muncul di sini</p>'+
+      '</div>';
+  }else{
+    list.forEach(function(r){
+      const s=S.students.find(function(x){return x.id===r.studentId;});
+      const kelas=s?s.kelas:'';
+      cards+='<div class="card-kid bg-white p-3 mb-2 border-l-4 border-l-amber-400">'+
+        '<div class="flex items-start justify-between gap-2 mb-2">'+
+        '<div class="min-w-0 flex-1">'+
+        '<div class="font-bold text-sm truncate">'+esc(r.studentName)+'</div>'+
+        '<div class="text-[10px] text-gray-500">'+esc(kelas)+' · '+fmtDate(r.waktu)+'</div>'+
+        '</div>'+
+        '<div class="text-right flex-shrink-0">'+
+        '<div class="font-bold text-amber-700 text-sm">'+esc(r.reward)+'</div>'+
+        '<div class="text-[10px] font-bold text-red-600">-'+r.biaya+' poin</div>'+
+        '</div></div>'+
+        '<div class="flex gap-2 mt-2">'+
+        '<button data-action="reject-redemption" data-redid="'+esc(r.redemptionId)+'" data-reward="'+esc(r.reward)+'" data-name="'+esc(r.studentName)+'" class="flex-1 bg-red-100 text-red-700 py-2 rounded-xl text-xs font-bold">✗ Tolak</button>'+
+        '<button data-action="approve-redemption" data-redid="'+esc(r.redemptionId)+'" data-reward="'+esc(r.reward)+'" data-name="'+esc(r.studentName)+'" class="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 text-white py-2 rounded-xl text-xs font-bold">✓ Setujui</button>'+
+        '</div></div>';
+    });
+  }
+  return '<div class="fade-in">'+
+    '<div class="page-header">'+
+    '<div class="icon-badge">🔔</div>'+
+    '<div class="flex-1"><h1>Notifikasi</h1>'+
+    '<div class="sub">'+list.length+' request reward pending</div></div></div>'+
+    (list.length>0?'<div class="bg-amber-50 border-2 border-amber-300 rounded-xl p-3 mb-3 text-xs text-amber-800">💡 <b>'+list.length+' santri</b> menunggu persetujuan Anda. Setelah disetujui, poin otomatis dipotong.</div>':'')+
+    cards+'</div>';
+}
+
+// =================================================================
+// VIEW: ADMIN USULAN REWARD
+// =================================================================
+function viewAdminUsulanReward(){
+  const list=S.rewardUsulanList||[];
+  let cards='';
+  if(list.length===0){
+    cards='<div class="card-kid bg-white p-8 text-center">'+
+      '<div class="text-5xl mb-2">📭</div>'+
+      '<p class="text-gray-500 font-bold text-sm">Belum ada usulan</p></div>';
+  }else{
+    list.forEach(function(u,i){
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      const isTop=u.voteCount>=3;
+      cards+='<div class="card-kid bg-white p-3 mb-2 '+(isTop?'border-l-4 border-l-amber-400':'')+'">'+
+        '<div class="flex items-start gap-3">'+
+        '<div class="text-center flex-shrink-0 min-w-[50px]">'+
+        '<div class="text-2xl font-black '+(isTop?'text-amber-500':'text-blue-500')+'">'+u.voteCount+'</div>'+
+        (medal?'<div class="text-lg">'+medal+'</div>':'<div class="text-[10px] text-gray-400 font-bold">vote</div>')+
+        '</div>'+
+        '<div class="flex-1 min-w-0">'+
+        '<div class="font-bold text-sm">'+esc(u.nama)+'</div>'+
+        (u.deskripsi?'<div class="text-[11px] text-gray-600 mb-1">'+esc(u.deskripsi)+'</div>':'')+
+        '<div class="text-[10px] text-gray-400">Diusul oleh '+esc(u.pengusulNama)+' · '+fmtDate(u.waktu)+'</div>'+
+        '</div></div>'+
+        '<div class="flex gap-2 mt-2">'+
+        '<button data-action="close-usulan" data-id="'+esc(u.id)+'" data-nama="'+esc(u.nama)+'" class="bg-gray-100 text-gray-600 px-3 py-2 rounded-xl text-xs font-bold">🚫 Tutup</button>'+
+        '<button data-action="promote-usulan" data-id="'+esc(u.id)+'" class="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 text-white py-2 rounded-xl text-xs font-black">✓ Jadikan Reward Resmi</button>'+
+        '</div></div>';
+    });
+  }
+  return '<div class="fade-in">'+
+    '<div class="page-header">'+
+    '<div class="icon-badge">📊</div>'+
+    '<div class="flex-1"><h1>Usulan Reward</h1>'+
+    '<div class="sub">'+list.length+' usulan dari santri</div></div></div>'+
+    '<div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-3 mb-3 text-xs text-blue-800">'+
+    '💡 <b>Cara pakai:</b> Klik <b>"Jadikan Reward Resmi"</b> untuk membuka form reward dengan nama & deskripsi terisi otomatis. Isi poin + stok, lalu simpan. Usulan lama bisa ditutup.'+
+    '</div>'+
+    cards+'</div>';
+}
+
+// =================================================================
+// VIEW: SANTRI USUL REWARD
+// =================================================================
+function viewSantriUsulReward(){
+  const ws=S.myWeeklyRewardStatus;
+  const list=S.rewardUsulanList||[];
+  let statusBanner='';
+  if(ws){
+    statusBanner='<div class="card-kid bg-white p-3 mb-3 border-2 border-blue-100">'+
+      '<div class="text-[10px] font-black text-gray-500 mb-2">📅 MINGGU INI ('+ws.mingguKey+')</div>'+
+      '<div class="flex gap-2 text-xs">'+
+      '<span class="px-2 py-1 rounded-lg font-bold '+(ws.bisaUsul?'bg-green-100 text-green-700':'bg-gray-100 text-gray-500')+'">'+
+      (ws.bisaUsul?'✅ Bisa Usul':'❌ Sudah Usul')+'</span>'+
+      '<span class="px-2 py-1 rounded-lg font-bold '+(ws.bisaVote?'bg-green-100 text-green-700':'bg-gray-100 text-gray-500')+'">'+
+      (ws.bisaVote?'✅ Bisa Vote':'❌ Sudah Vote')+'</span>'+
+      '</div></div>';
+  }
+  let cards='';
+  if(list.length===0){
+    cards='<div class="card-kid bg-white p-8 text-center">'+
+      '<div class="text-5xl mb-2">💡</div>'+
+      '<p class="text-gray-500 font-bold text-sm">Belum ada usulan</p>'+
+      '<p class="text-gray-400 text-xs mt-1">Jadilah yang pertama mengusulkan reward!</p></div>';
+  }else{
+    list.forEach(function(u,i){
+      const isTop3=i<3;
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      const votedThis=ws&&ws.votedForId===u.id;
+      cards+='<div class="card-kid bg-white p-3 mb-2 '+(isTop3?'border-2 border-amber-300':'')+'">'+
+        '<div class="flex items-start gap-3">'+
+        '<div class="text-center flex-shrink-0">'+
+        '<div class="text-2xl font-black '+(isTop3?'text-amber-500':'text-blue-500')+'">'+u.voteCount+'</div>'+
+        (medal?'<div class="text-xl">'+medal+'</div>':'<div class="text-[10px] text-gray-400 font-bold">vote</div>')+
+        '</div>'+
+        '<div class="flex-1 min-w-0">'+
+        '<div class="font-bold text-sm">'+esc(u.nama)+'</div>'+
+        (u.deskripsi?'<div class="text-[11px] text-gray-600 mb-1">'+esc(u.deskripsi)+'</div>':'')+
+        '<div class="text-[10px] text-gray-400">Diusul oleh '+esc(u.pengusulNama)+'</div>'+
+        '</div></div>'+
+        '<button data-action="vote-reward" data-id="'+esc(u.id)+'" data-nama="'+esc(u.nama)+'" '+
+        (ws&&ws.bisaVote?'':'disabled')+' class="btn-kid w-full mt-2 '+
+        (votedThis?'bg-blue-500 text-white':(ws&&ws.bisaVote?'bg-blue-100 text-blue-700':'bg-gray-100 text-gray-400'))+' py-2 rounded-xl text-xs font-bold disabled:opacity-50">'+
+        (votedThis?'✓ Sudah Kamu Vote':(ws&&ws.bisaVote?'👍 Vote Reward Ini':'Vote minggu depan'))+
+        '</button></div>';
+    });
+  }
+  let modal='';
+  if(S.showUsulForm){
+    modal='<div class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">'+
+      '<div class="bg-white p-4 w-full max-w-md rounded-t-3xl sm:rounded-3xl slide-up" style="border-top:4px solid #fbbf24;">'+
+      '<div class="handle mx-auto" style="width:40px;height:4px;background:#d1d5db;border-radius:2px;margin-bottom:12px;"></div>'+
+      '<h3 class="font-bold text-base mb-3">💡 Usul Reward Baru</h3>'+
+      '<div class="space-y-3">'+
+      '<div><label class="block text-xs font-bold mb-1">Nama Reward</label>'+
+      '<input type="text" value="'+esc(S.usulRewardNama)+'" oninput="S.usulRewardNama=this.value" maxlength="100" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm" placeholder="Contoh: Buku Gambar A3" /></div>'+
+      '<div><label class="block text-xs font-bold mb-1">Alasan / Deskripsi (opsional)</label>'+
+      '<textarea rows="3" oninput="S.usulRewardDesc=this.value" maxlength="300" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm resize-none" placeholder="Kenapa reward ini keren?">'+esc(S.usulRewardDesc)+'</textarea></div>'+
+      '<div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-2 text-[11px] text-blue-800">💡 Usulanmu otomatis dapat <b>1 vote</b>. Teman lain bisa vote untuk mendukung.</div>'+
+      '<div class="flex gap-2 pt-1">'+
+      '<button data-action="close-usul-form" class="btn-kid flex-1 bg-gray-200 py-2.5 rounded-xl text-sm">Batal</button>'+
+      '<button data-action="submit-usul-reward" '+(S.submitting?'disabled':'')+' class="btn-kid flex-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white py-2.5 rounded-xl text-sm font-black disabled:opacity-60">Kirim Usulan</button>'+
+      '</div></div></div></div>';
+  }
+  return '<div class="fade-in">'+
+    '<div class="page-header">'+
+    '<div class="icon-badge">💡</div>'+
+    '<div class="flex-1"><h1>Usul Reward</h1><div class="sub">'+list.length+' usulan · 1 usul &amp; 1 vote per minggu</div></div>'+
+    '</div>'+
+    statusBanner+
+    '<button data-action="open-usul-form" '+(ws&&ws.bisaUsul?'':'disabled')+' class="btn-kid w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-3 rounded-2xl font-black mb-3 disabled:opacity-50">'+
+    (ws&&ws.bisaUsul?'+ Ajukan Reward Baru':'⏳ Sudah usul minggu ini')+'</button>'+
+    '<div class="text-[11px] font-black text-gray-500 mb-2 mt-4">🔥 PALING POPULER</div>'+
+    cards+modal+'</div>';
+}
+
+// =================================================================
+// VIEW: BADGE ADMIN
 // =================================================================
 function viewAdminBadge(){
   let cards='';
@@ -2219,7 +2520,7 @@ function viewAdminBadge(){
 }
 
 // =================================================================
-// VIEW: BADGE (Santri)
+// VIEW: BADGE SANTRI
 // =================================================================
 function viewSantriBadges(){
   let earned={};
@@ -2241,7 +2542,7 @@ function viewSantriBadges(){
 }
 
 // =================================================================
-// VIEW: KUIS (Admin)
+// VIEW: KUIS ADMIN
 // =================================================================
 function viewAdminKuis(){
   let cards='';
@@ -2249,11 +2550,13 @@ function viewAdminKuis(){
     cards+='<div class="card-kid bg-gradient-to-br from-orange-50 to-red-100 p-3">'+
       '<div class="flex justify-between mb-1"><div class="text-2xl">❓</div>'+
       '<div class="flex gap-1">'+
+      '<button data-action="edit-kuis" data-id="'+k.id+'" class="bg-white p-1.5 rounded-lg text-amber-600 text-[10px]">✏</button>'+
       '<button data-action="open-kuis-detail" data-id="'+k.id+'" class="bg-white p-1.5 rounded-lg text-blue-600 text-[10px]">👁</button>'+
       '<button data-action="delete-kuis" data-id="'+k.id+'" class="bg-white p-1.5 rounded-lg text-red-600 text-[10px]">🗑</button>'+
       '</div></div>'+
       '<h3 class="font-bold text-sm">'+esc(k.judul)+'</h3>'+
       '<p class="text-[10px] text-gray-600">'+esc(k.deskripsi)+'</p>'+
+      (k.maxPoin>0?'<div class="text-[10px] font-bold text-amber-600 mt-1">🎯 Maks '+k.maxPoin+' poin</div>':'')+
       (k.kelas?'<div class="text-[10px] bg-white px-1.5 py-0.5 rounded-full inline-block font-bold mt-1">'+esc(k.kelas)+'</div>':'')+'</div>';
   });
   let modal='';
@@ -2277,11 +2580,12 @@ function viewAdminKuis(){
     modal='<div class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 overflow-y-auto">'+
       '<form onsubmit="saveKuis(event)" class="bg-white p-4 w-full max-w-lg shadow-2xl slide-up sm:fade-in max-h-[90vh] overflow-y-auto" style="border-radius:24px 24px 0 0;border-top:4px solid #fb923c;">'+
       '<div class="handle mx-auto" style="width:40px;height:4px;background:#d1d5db;border-radius:2px;margin-bottom:12px;"></div>'+
-      '<h3 class="font-bold text-base mb-3">Buat Kuis</h3>'+
+      '<h3 class="font-bold text-base mb-3">'+(ed.id?'Edit':'Buat')+' Kuis</h3>'+
       '<div class="space-y-2">'+
       '<input type="text" required value="'+esc(ed.judul)+'" oninput="S.editingKuis.judul=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm" placeholder="Judul" />'+
       '<input type="text" value="'+esc(ed.deskripsi)+'" oninput="S.editingKuis.deskripsi=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm" placeholder="Deskripsi" />'+
       '<select onchange="S.editingKuis.kelas=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm">'+kelasOpts+'</select>'+
+      '<input type="number" min="0" value="'+(ed.maxPoin||0)+'" oninput="S.editingKuis.maxPoin=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm" placeholder="🎯 Poin maksimal (0 = tanpa poin)" />'+
       '<div>'+soalHtml+'</div>'+
       '<button type="button" data-action="add-soal-kuis" class="w-full bg-gray-100 text-gray-700 font-bold py-2 rounded-xl text-xs">+ Tambah Soal</button>'+
       '<div class="flex gap-2 pt-1"><button type="button" data-action="close-kuis-modal" class="btn-kid flex-1 bg-gray-200 py-2.5 rounded-xl text-sm">Batal</button>'+
@@ -2310,7 +2614,7 @@ function viewAdminKuis(){
 }
 
 // =================================================================
-// VIEW: KUIS (Santri)
+// VIEW: KUIS SANTRI
 // =================================================================
 function viewSantriKuis(){
   let cards='';
@@ -2320,6 +2624,7 @@ function viewSantriKuis(){
     cards+='<div class="card-kid bg-gradient-to-br from-orange-50 to-red-100 p-3">'+
       '<div class="text-2xl mb-1">❓</div><h3 class="font-bold text-sm">'+esc(k.judul)+'</h3>'+
       '<p class="text-[10px] text-gray-600 mb-2">'+esc(k.deskripsi)+'</p>'+
+      (k.maxPoin>0?'<div class="text-[10px] font-bold text-amber-600 mb-1">🎯 Maks '+k.maxPoin+' poin</div>':'')+
       '<button data-action="open-kuis-detail" data-id="'+k.id+'" class="btn-kid w-full bg-orange-500 text-white py-2 text-xs rounded-xl">Mulai</button></div>';
   });
   let detailModal='';
@@ -2435,7 +2740,7 @@ function viewAdminRiwayat(){
     const sign=l.points>0?'+':'';
     return '<div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">'+
       '<div class="min-w-0 flex-1"><div class="font-bold text-xs truncate">'+esc(l.studentName)+'</div>'+
-      '<div class="text-[10px] text-gray-500">'+esc(l.activity)+' · '+fmtDate(l.time||l.waktu)+'</div></div>'+
+      '<div class="text-[10px] text-gray-500">'+esc(l.activity)+' · '+fmtDate(l.waktu)+'</div></div>'+
       '<span class="font-black text-sm '+cls+'">'+sign+l.points+'</span></div>';
   }).join('');
   return '<div class="fade-in">'+
@@ -2564,7 +2869,7 @@ function viewAdminArsip(){
 }
 
 // =================================================================
-// VIEW: EVALUASI (Admin)
+// VIEW: EVALUASI ADMIN
 // =================================================================
 function viewAdminEvaluasi(){
   let rows=S.evaluasiList.map(function(e){
@@ -2784,7 +3089,7 @@ document.addEventListener('drop',function(e){
 });
 
 // =================================================================
-// GOTO dengan scroll reset saat ganti view
+// GOTO
 // =================================================================
 async function goto(view){
   const viewChanged=S.view!==view;
@@ -2803,13 +3108,16 @@ async function goto(view){
   else if(view==='grafik')await loadGrafik();
   else if(view==='reward')await loadRedemptions();
   else if(view==='poin')await loadPoinHariIni();
+  else if(view==='admin_notif')await loadPendingRedemptions();
+  else if(view==='admin_usulan')await loadRewardUsulan();
+  else if(view==='usul_reward'){await loadRewardUsulan();await loadMyWeeklyRewardStatus();}
   if(viewChanged){window.scrollTo(0,0);render({preserveScroll:false});}
   else render();
 }
 async function selectArsip(p){S.arsipSelected=p;try{S.arsipData=await api('getArsipPoin',p);}catch(err){showToast('Gagal: '+err.message,'error');}render();}
 
 // =================================================================
-// SERVICE WORKER REGISTRATION
+// SERVICE WORKER
 // =================================================================
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
@@ -2820,8 +3128,16 @@ if('serviceWorker' in navigator){
 }
 
 // =================================================================
-// BOOT
+// AUTO-REFRESH PENDING NOTIF
 // =================================================================
+setInterval(function(){
+  if(S.user&&S.user.role==='admin'){
+    loadPendingRedemptions().then(function(){
+      if(S.view==='admin_notif'||S.view==='dashboard')render();
+    });
+  }
+},60000);
+
 // =================================================================
 // BOOT
 // =================================================================
