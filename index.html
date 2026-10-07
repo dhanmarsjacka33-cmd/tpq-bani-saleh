@@ -282,6 +282,34 @@ function extractYouTubeId(url){
   if(/^[A-Za-z0-9_-]{11}$/.test(url))return url;
   return null;
 }
+/**
+ * Konversi URL Telegram post → embed URL untuk iframe.
+ * Format yang didukung:
+ *   - https://t.me/{channel}/{post_id}
+ *   - https://t.me/s/{channel}/{post_id}   (preview)
+ *   - https://telegram.me/{channel}/{post_id}
+ *   - t.me/{channel}/{post_id}
+ * Return null jika tidak valid.
+ */
+function extractTelegramEmbedUrl(url) {
+  if (!url) return null;
+  url = String(url).trim();
+
+  // Hapus protokol dulu biar regex simpel
+  let clean = url.replace(/^https?:\/\//i, '').replace(/^\/\//, '');
+
+  // Hapus prefix "t.me/s/" (preview) → jadi "t.me/"
+  clean = clean.replace(/^(t\.me|telegram\.me)\/s\//, '$1/');
+
+  // Match: (t.me|telegram.me)/{channel}/{post_id}
+  const m = clean.match(/^(?:t\.me|telegram\.me)\/([A-Za-z0-9_]+)\/(\d+)(?:\?.*)?$/i);
+  if (m) {
+    return 'https://t.me/' + m[1] + '/' + m[2] + '?embed=1&mode=tme';
+  }
+
+  // Match: t.me/c/{id}/{post_id} → private channel, tidak bisa embed
+  return null;
+}
 function matchSetoranGroup(s,filter){if(filter==='semua')return true;if(!s)return false;const k=String(s.kelas||'').toLowerCase();if(filter==='Iqra')return k.indexOf('iqra')!==-1;if(filter==='Al-Quran')return k.indexOf('qur')!==-1;return false;}
 function getKelasList(){const set={};S.students.forEach(function(s){if(s.kelas)set[s.kelas]=true;});S.jadwalList.forEach(function(j){if(j.kelas)set[j.kelas]=true;});return Object.keys(set).sort();}
 function getGuruList(){const set={};S.jadwalList.forEach(function(j){if(j.guru&&String(j.guru).trim())set[String(j.guru).trim()]=true;});return Object.keys(set).sort();}
@@ -2199,11 +2227,19 @@ function viewAdminKelolaPoin(){
 // VIEW: KELOLA MATERI
 // =================================================================
 function viewAdminKelolaMateri(){
-  const TYPES=[{v:'text',l:'Teks',i:'📄'},{v:'image',l:'Gambar',i:'🖼️'},{v:'pdf',l:'PDF',i:'📕'},{v:'video',l:'Video',i:'🎥'},{v:'audio',l:'Audio',i:'🎵'},{v:'link',l:'Link',i:'🔗'}];
+  const TYPES=[
+  {v:'text',l:'Teks',i:'📄'},
+  {v:'image',l:'Gambar',i:'🖼️'},
+  {v:'pdf',l:'PDF',i:'📕'},
+  {v:'video',l:'Video',i:'🎥'},
+  {v:'audio',l:'Audio',i:'🎵'},
+  {v:'link',l:'Link',i:'🔗'},
+  {v:'telegram',l:'Telegram',i:'✈️'}
+];
   let cards='';
   if(S.materials.length===0)cards='<p class="text-gray-400 text-center py-6 col-span-full text-xs">Belum ada materi.</p>';
   else S.materials.forEach(function(m){
-    const typeColors={text:'from-blue-100 to-cyan-100 border-blue-300',pdf:'from-red-100 to-orange-100 border-red-300',image:'from-purple-100 to-pink-100 border-purple-300',video:'from-rose-100 to-pink-100 border-rose-300',audio:'from-green-100 to-emerald-100 border-green-300',link:'from-cyan-100 to-blue-100 border-cyan-300'};
+    const typeColors={text:'from-blue-100 to-cyan-100 border-blue-300',pdf:'from-red-100 to-orange-100 border-red-300',image:'from-purple-100 to-pink-100 border-purple-300',video:'from-rose-100 to-pink-100 border-rose-300',audio:'from-green-100 to-emerald-100 border-green-300',link:'from-cyan-100 to-blue-100 border-cyan-300',telegram:'from-sky-100 to-blue-100 border-sky-300'};
     const imgCount=(m.images&&m.images.length)?m.images.length:0;
     const thumb=imgCount>0?m.images[0].url:null;
     cards+='<div class="bg-gradient-to-br '+(typeColors[m.type]||'from-gray-100 to-gray-200 border-gray-300')+' rounded-2xl p-3 border-2">'+
@@ -2244,7 +2280,7 @@ function viewAdminKelolaMateri(){
         '<input type="text" value="'+esc(ed.content)+'" oninput="S.editingMateri.content=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-xs" placeholder="Atau URL gambar" />'+
         '</div>';
     }else{
-      const ph=ed.type==='pdf'?'URL PDF':ed.type==='video'?'URL YouTube':ed.type==='audio'?'URL audio':ed.type==='link'?'URL tujuan':'Tulis materi...';
+      const ph=ed.type==='pdf'?'URL PDF':ed.type==='video'?'URL YouTube':ed.type==='audio'?'URL audio':ed.type==='link'?'URL tujuan':ed.type==='telegram'?'URL Telegram Post (contoh: https://t.me/FilmNabiYusufAS/3)':'Tulis materi...';
       imageSection=ed.type==='text'?'<textarea rows="4" oninput="S.editingMateri.content=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 resize-none text-sm" placeholder="'+ph+'">'+esc(ed.content)+'</textarea>'
       :'<input type="text" value="'+esc(ed.content)+'" oninput="S.editingMateri.content=this.value" class="w-full bg-yellow-50 border-2 border-yellow-200 rounded-xl px-3 py-2 text-sm" placeholder="'+ph+'" />';
     }
@@ -2274,8 +2310,8 @@ function viewAdminKelolaMateri(){
 // VIEW: MATERI (Santri)
 // =================================================================
 function viewMateri(){
-  const typeColors={text:'from-blue-100 to-cyan-100 border-blue-300',pdf:'from-red-100 to-orange-100 border-red-300',image:'from-purple-100 to-pink-100 border-purple-300',video:'from-rose-100 to-pink-100 border-rose-300',audio:'from-green-100 to-emerald-100 border-green-300',link:'from-cyan-100 to-blue-100 border-cyan-300'};
-  const typeIcons={text:'📄',pdf:'📕',image:'🖼',video:'🎥',audio:'🎵',link:'🔗'};
+  const typeColors={text:'from-blue-100 to-cyan-100 border-blue-300',pdf:'from-red-100 to-orange-100 border-red-300',image:'from-purple-100 to-pink-100 border-purple-300',video:'from-rose-100 to-pink-100 border-rose-300',audio:'from-green-100 to-emerald-100 border-green-300',link:'from-cyan-100 to-blue-100 border-cyan-300',telegram:'from-sky-100 to-blue-100 border-sky-300'};
+  const typeIcons={text:'📄',pdf:'📕',image:'🖼',video:'🎥',audio:'🎵',link:'🔗',telegram:'✈️'};
   let cards='';
   if(S.materials.length===0)cards='<p class="text-gray-400 text-center py-6 col-span-full text-xs">Belum ada materi.</p>';
   else S.materials.forEach(function(m){
@@ -2312,7 +2348,28 @@ function viewMateri(){
     }
     else if(m.type==='audio')body='<audio controls src="'+esc(m.content)+'" class="w-full"></audio>';
     else if(m.type==='pdf')body='<iframe src="'+esc(m.content)+'" class="w-full rounded-xl" style="height:400px;border:0;"></iframe>';
-    else if(m.type==='link')body='<a href="'+esc(m.content)+'" target="_blank" class="text-blue-500 underline break-all text-xs">'+esc(m.content)+'</a>';
+    else if(m.type==='link'){
+  const tgEmbed=extractTelegramEmbedUrl(m.content);
+  if(tgEmbed){
+    body='<div class="rounded-2xl overflow-hidden border-2 border-blue-200 bg-white" style="min-height:520px;">'+
+      '<iframe src="'+esc(tgEmbed)+'" class="w-full" style="height:520px;border:0;" allowfullscreen></iframe></div>'+
+      '<div class="text-center mt-3"><a href="'+esc(m.content)+'" target="_blank" rel="noopener" class="btn-kid bg-blue-500 text-white px-4 py-2 text-xs inline-block">📱 Buka di Telegram</a></div>';
+  }else{
+    body='<a href="'+esc(m.content)+'" target="_blank" class="text-blue-500 underline break-all text-xs">'+esc(m.content)+'</a>';
+  }
+}
+else if(m.type==='telegram'){
+  const tgEmbed=extractTelegramEmbedUrl(m.content);
+  if(tgEmbed){
+    body='<div class="rounded-2xl overflow-hidden border-2 border-blue-200 bg-white" style="min-height:520px;">'+
+      '<iframe src="'+esc(tgEmbed)+'" class="w-full" style="height:520px;border:0;" allowfullscreen></iframe></div>'+
+      '<div class="text-center mt-3"><a href="'+esc(m.content)+'" target="_blank" rel="noopener" class="btn-kid bg-blue-500 text-white px-4 py-2 text-xs inline-block">📱 Buka di Telegram</a></div>';
+  }else{
+    body='<div class="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 text-center">'+
+      '<p class="text-amber-800 text-xs mb-2">URL Telegram tidak valid.</p>'+
+      '<a href="'+esc(m.content)+'" target="_blank" class="btn-kid bg-blue-500 text-white px-4 py-2 text-xs inline-block">Buka Link</a></div>';
+  }
+}
     else body='<p class="text-gray-700 whitespace-pre-line text-sm">'+esc(m.content)+'</p>';
     preview='<div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4" data-action="close-preview">'+
       '<div class="bg-white p-4 max-w-2xl w-full max-h-[90vh] overflow-y-auto" style="border-radius:20px;border:3px solid #60a5fa;" onclick="event.stopPropagation()">'+
