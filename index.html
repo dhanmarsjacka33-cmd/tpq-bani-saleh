@@ -4,901 +4,433 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TPQ Bani Saleh - Aplikasi</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { margin: 0; font-family: 'Fredoka', system-ui, sans-serif; background: #fef9f3; }
-  h1, h2, h3, .font-head { font-family: 'Baloo 2', 'Fredoka', sans-serif; font-weight: 700; }
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: #fcd34d; border-radius: 8px; }
-  ::-webkit-scrollbar-track { background: #fef3c7; }
+  body { font-family: 'Fredoka', sans-serif; background: #fef9f3; }
   .hide-scroll::-webkit-scrollbar { display: none; }
-  .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-  
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .fade-in { animation: fadeIn 0.3s ease-out; }
-  
-  .card-kid { border-radius: 20px; box-shadow: 0 4px 0 rgba(0,0,0,0.05), 0 8px 20px rgba(0,0,0,0.05); border: 3px solid #fff; transition: transform 0.15s; }
-  .card-kid:hover { transform: translateY(-2px); }
-  .btn-kid { border-radius: 16px; border-bottom: 4px solid rgba(0,0,0,0.15); transition: all 0.1s; font-weight: 700; }
-  .btn-kid:active { transform: translateY(2px); border-bottom-width: 2px; }
-  
-  .status-btn { padding: 8px 4px; border-radius: 12px; font-weight: 700; font-size: 11px; cursor: pointer; border: 2px solid; transition: all 0.15s; text-align: center; }
-  .status-hadir { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
-  .status-hadir.active { background: #10b981; color: white; border-color: #059669; box-shadow: 0 2px 6px rgba(16,185,129,0.4); transform: scale(1.05); }
-  .status-sakit { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-  .status-sakit.active { background: #f59e0b; color: white; border-color: #d97706; box-shadow: 0 2px 6px rgba(245,158,11,0.4); transform: scale(1.05); }
-  .status-izin { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
-  .status-izin.active { background: #3b82f6; color: white; border-color: #2563eb; box-shadow: 0 2px 6px rgba(59,130,246,0.4); transform: scale(1.05); }
-  .status-alfa { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-  .status-alfa.active { background: #ef4444; color: white; border-color: #dc2626; box-shadow: 0 2px 6px rgba(239,68,68,0.4); transform: scale(1.05); }
-
-  .rule-check { border-radius: 12px; padding: 10px; border: 2px solid; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; user-select: none; }
-  .rule-pos { background: #f0fdf4; border-color: #bbf7d0; }
-  .rule-pos.selected { background: #dcfce7; border-color: #10b981; box-shadow: 0 2px 6px rgba(16,185,129,0.2); }
-  .rule-neg { background: #fef2f2; border-color: #fecaca; }
-  .rule-neg.selected { background: #fee2e2; border-color: #ef4444; box-shadow: 0 2px 6px rgba(239,68,68,0.2); }
-  .rule-checkbox { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #cbd5e1; background: white; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-  .rule-pos.selected .rule-checkbox { background: #10b981; border-color: #10b981; }
-  .rule-neg.selected .rule-checkbox { background: #ef4444; border-color: #ef4444; }
-  .rule-checkbox-inner { color: white; font-size: 12px; font-weight: 900; }
+  .card { border-radius: 16px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+  .btn { border-radius: 12px; border-bottom: 3px solid rgba(0,0,0,0.1); transition: 0.1s; font-weight: bold; }
+  .btn:active { transform: translateY(2px); border-bottom-width: 1px; }
+  .status-btn { padding: 6px; border-radius: 8px; font-weight: bold; font-size: 11px; border: 2px solid; transition: 0.15s; text-align: center; }
+  .status-hadir.active { background: #10b981; color: white; border-color: #059669; }
+  .status-sakit.active { background: #f59e0b; color: white; border-color: #d97706; }
+  .status-izin.active { background: #3b82f6; color: white; border-color: #2563eb; }
+  .status-alfa.active { background: #ef4444; color: white; border-color: #dc2626; }
+  @media print { .no-print { display: none !important; } body { background: white; } }
 </style>
 </head>
 <body>
-<div id="app">
-  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fef3c7,#fce7f3);">
-    <div style="background:white;padding:40px;border-radius:24px;text-align:center;">
-      <div class="text-5xl mb-4">📖</div>
-      <h1 class="text-2xl font-bold text-amber-500">Memuat Aplikasi...</h1>
-    </div>
-  </div>
-</div>
+<div id="app"></div>
 
 <script>
-// =================================================================
-// KONFIGURASI API (URL Web App Apps Script Anda)
-// =================================================================
 const API_URL = 'https://script.google.com/macros/s/AKfycbxSh_flmpcz2ADg0QEZ1lR7PFnt5DEsnoCzfku7eLzvZfwql31zD9Mtafw9rdG5ctyZ/exec';
 
-// =================================================================
-// STATE
-// =================================================================
+// ================= DATA QURAN (Juz -> Surah) =================
+const JUZ_SURAH = {1:['Al-Fatihah','Al-Baqarah'],2:['Al-Baqarah'],3:['Al-Baqarah',"Ali 'Imran"],4:["Ali 'Imran",'An-Nisa'],5:['An-Nisa'],6:['An-Nisa',"Al-Ma'idah"],7:["Al-Ma'idah","Al-An'am"],8:["Al-An'am","Al-A'raf"],9:["Al-A'raf",'Al-Anfal'],10:['Al-Anfal','At-Taubah'],11:['At-Taubah','Yunus','Hud'],12:['Hud','Yusuf'],13:['Yusuf',"Ar-Ra'd",'Ibrahim'],14:['Al-Hijr','An-Nahl'],15:['Al-Isra','Al-Kahf'],16:['Al-Kahf','Maryam','Ta-Ha'],17:['Al-Anbiya','Al-Hajj'],18:["Al-Mu'minun",'An-Nur','Al-Furqan'],19:['Al-Furqan',"Asy-Syu'ara",'An-Naml'],20:['An-Naml','Al-Qasas','Al-Ankabut'],21:['Al-Ankabut','Ar-Rum','Luqman','As-Sajdah','Al-Ahzab'],22:['Al-Ahzab',"Saba'",'Fatir','Yasin'],23:['Yasin','As-Saffat','Sad','Az-Zumar'],24:['Az-Zumar','Ghafir','Fussilat'],25:['Fussilat','Asy-Syura','Az-Zukhruf','Ad-Dukhan','Al-Jatsiyah'],26:['Al-Ahqaf','Muhammad','Al-Fath','Al-Hujurat','Qaf','Az-Zariyat'],27:['Az-Zariyat','At-Tur','An-Najm','Al-Qamar','Ar-Rahman',"Al-Waqi'ah",'Al-Hadid'],28:['Al-Mujadilah','Al-Hasyr','Al-Mumtahanah','As-Saff',"Al-Jumu'ah",'Al-Munafiqun','At-Taghabun','At-Talaq','At-Tahrim'],29:['Al-Mulk','Al-Qalam','Al-Haqqah',"Al-Ma'arij",'Nuh','Al-Jinn','Al-Muzzammil','Al-Muddassir','Al-Qiyamah','Al-Insan','Al-Mursalat'],30:['An-Naba',"An-Nazi'at","'Abasa",'At-Takwir','Al-Infitar','Al-Mutaffifin','Al-Insyiqaq','Al-Buruj','At-Tariq',"Al-A'la",'Al-Gasyiyah','Al-Fajr','Al-Balad','Asy-Syams','Al-Lail','Ad-Duha','Asy-Syarh','At-Tin',"Al-'Alaq",'Al-Qadr','Al-Bayyinah','Az-Zalzalah',"Al-'Adiyat","Al-Qari'ah",'At-Takasur',"Al-'Asr",'Al-Humazah','Al-Fil','Quraisy',"Al-Ma'un",'Al-Kausar','Al-Kafirun','An-Nasr','Al-Lahab','Al-Ikhlas','Al-Falaq','An-Nas']};
+const SURAH_AYAT = {'Al-Fatihah':7,'Al-Baqarah':286,"Ali 'Imran":200,'An-Nisa':176,"Al-Ma'idah":120,"Al-An'am":165,"Al-A'raf":206,'Al-Anfal':75,'At-Taubah':129,'Yunus':109,'Hud':123,'Yusuf':111,"Ar-Ra'd":43,'Ibrahim':52,'Al-Hijr':99,'An-Nahl':128,'Al-Isra':111,'Al-Kahf':110,'Maryam':98,'Ta-Ha':135,'Al-Anbiya':112,'Al-Hajj':78,"Al-Mu'minun":118,'An-Nur':64,'Al-Furqan':77,"Asy-Syu'ara":227,'An-Naml':93,'Al-Qasas':88,'Al-Ankabut':69,'Ar-Rum':60,'Luqman':34,'As-Sajdah':30,'Al-Ahzab':73,"Saba'":54,'Fatir':45,'Yasin':83,'As-Saffat':182,'Sad':88,'Az-Zumar':75,'Ghafir':85,'Fussilat':54,'Asy-Syura':53,'Az-Zukhruf':89,'Ad-Dukhan':59,'Al-Jatsiyah':37,'Al-Ahqaf':35,'Muhammad':38,'Al-Fath':29,'Al-Hujurat':18,'Qaf':45,'Az-Zariyat':60,'At-Tur':49,'An-Najm':62,'Al-Qamar':55,'Ar-Rahman':78,"Al-Waqi'ah":96,'Al-Hadid':29,'Al-Mujadilah':22,'Al-Hasyr':24,'Al-Mumtahanah':13,'As-Saff':14,"Al-Jumu'ah":11,'Al-Munafiqun':11,'At-Taghabun':18,'At-Talaq':12,'At-Tahrim':12,'Al-Mulk':30,'Al-Qalam':52,'Al-Haqqah':52,"Al-Ma'arij":44,'Nuh':28,'Al-Jinn':28,'Al-Muzzammil':20,'Al-Muddassir':56,'Al-Qiyamah':40,'Al-Insan':31,'Al-Mursalat':50,'An-Naba':40,"An-Nazi'at":46,"'Abasa":42,'At-Takwir':29,'Al-Infitar':19,'Al-Mutaffifin':36,'Al-Insyiqaq':25,'Al-Buruj':22,'At-Tariq':17,"Al-A'la":19,'Al-Gasyiyah':26,'Al-Fajr':30,'Al-Balad':20,'Asy-Syams':15,'Al-Lail':21,'Ad-Duha':11,'Asy-Syarh':8,'At-Tin':8,"Al-'Alaq":19,'Al-Qadr':5,'Al-Bayyinah':8,'Az-Zalzalah':8,"Al-'Adiyat":11,"Al-Qari'ah":11,'At-Takasur':8,"Al-'Asr":3,'Al-Humazah':9,'Al-Fil':5,'Quraisy':4,"Al-Ma'un":7,'Al-Kausar':3,'Al-Kafirun':6,'An-Nasr':3,'Al-Lahab':5,'Al-Ikhlas':4,'Al-Falaq':5,'An-Nas':6};
+
+// ================= STATE =================
 const S = {
-  user: null, view: 'dashboard',
+  user: null, view: 'dashboard', loading: true, error: '',
   students: [], rules: [], dashboard: null,
-  loading: true, error: '',
-  
-  // Login state
+  filterKelas: '', // ⭐ Filter Global
   loginView: 'selection', loginUser: '', loginPass: '', loginStudent: '', loginError: '', isLoggingIn: false,
+  absenTanggal: new Date().toISOString().slice(0,10), absenData: {},
+  poinTab: 'aturan', selectedStudents: [], selectedRules: {}, customAmount: '', customNote: '', searchTerm: '',
   
-  // Absensi state
-  absenTanggal: new Date().toISOString().slice(0, 10),
-  absenData: {},
+  // Setoran State
+  setoranMassal: false,
+  setoranData: { studentIds: [], tipe: 'Bacaan', subTipe: 'Iqra Hitam', jilid: '1', halaman: '', juz: '30', surah: '', ayatStart: '', ayatEnd: '', detailManual: '', status: 'Lancar', catatan: '' },
   
-  // Poin state
-  poinTab: 'aturan', selectedStudents: [], selectedRules: {}, customAmount: '', customNote: '',
-  searchTerm: '',
+  // Rekap State
+  rekapTab: 'kehadiran', rekapBulan: new Date().getMonth()+1, rekapTahun: new Date().getFullYear(), rekapData: [], rekapSetoranData: [], rekapTanggal: new Date().toISOString().slice(0,10),
   
-  // Setoran state
-  setoranData: { studentId: '', jenis: 'Iqra', detail: '', status: 'Lancar', catatan: '' },
-  
-  // Rapor state
-  raporStudent: '', raporBulan: new Date().getMonth() + 1, raporTahun: new Date().getFullYear(),
-  raporData: null,
-  
-  // Rekap state
-  rekapBulan: new Date().getMonth() + 1, rekapTahun: new Date().getFullYear(), rekapData: [],
-  
-  // Riwayat state
-  riwayatData: [],
-  
-  // Kelola Santri state
-  editingSantri: null,
-  
-  // Pengaturan state
-  newAturan: { name: '', points: 1 },
-  
+  raporStudent: '', raporBulan: new Date().getMonth()+1, raporTahun: new Date().getFullYear(), raporData: null,
+  editingSantri: null, newAturan: { name: '', points: 1 },
   submitting: false
 };
-
 const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
-// =================================================================
-// HELPERS
-// =================================================================
-function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function showToast(msg, type = 'info') {
-  const colors = { success: 'from-green-500 to-emerald-600', error: 'from-red-500 to-rose-600', info: 'from-blue-500 to-indigo-600', warn: 'from-amber-500 to-orange-600' };
-  const el = document.createElement('div');
-  el.className = `fixed bottom-4 right-4 z-[9999] px-5 py-3 rounded-xl text-white font-bold shadow-2xl bg-gradient-to-r ${colors[type]} fade-in`;
-  el.style.maxWidth = '350px';
-  el.innerHTML = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3500);
-}
-function token() { return sessionStorage.getItem('tpq_token') || ''; }
-function setToken(t) { t ? sessionStorage.setItem('tpq_token', t) : sessionStorage.removeItem('tpq_token'); }
-function saveUser(u) { u ? sessionStorage.setItem('tpq_user', JSON.stringify(u)) : sessionStorage.removeItem('tpq_user'); }
+// ================= HELPERS =================
+const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const showToast = (msg, type='info') => { const c={success:'bg-green-500',error:'bg-red-500',info:'bg-blue-500',warn:'bg-amber-500'}; const e=document.createElement('div'); e.className=`fixed bottom-4 right-4 z-50 px-4 py-2 rounded-xl text-white font-bold shadow-lg ${c[type]} fade-in`; e.innerHTML=msg; document.body.appendChild(e); setTimeout(()=>e.remove(),3000); };
+const token = () => sessionStorage.getItem('tpq_token')||'';
+const setToken = t => t?sessionStorage.setItem('tpq_token',t):sessionStorage.removeItem('tpq_token');
+const saveUser = u => u?sessionStorage.setItem('tpq_user',JSON.stringify(u)):sessionStorage.removeItem('tpq_user');
 
-// =================================================================
-// API WRAPPER
-// =================================================================
-async function api(fnName, ...args) {
-  const payload = { fn: fnName, args: [token()].concat(args) };
+async function api(fn, ...args) {
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload), redirect: 'follow'
-    });
-    if (!res.ok) throw new Error('HTTP Error ' + res.status);
-    const json = await res.json();
-    if (!json.ok) {
-      if (json.error.includes('Sesi habis') || json.error.includes('Login ulang')) {
-        sessionStorage.clear(); S.user = null; render(); 
-        throw new Error('Sesi habis, silakan login ulang.');
-      }
-      throw new Error(json.error);
-    }
-    return json.data;
-  } catch (err) {
-    throw new Error(err.message || String(err));
-  }
+    const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({fn, args:[token()].concat(args)}) });
+    const j = await res.json(); if(!j.ok) throw new Error(j.error); return j.data;
+  } catch(e) { throw new Error(e.message); }
 }
-async function apiLogin(fnName, ...args) {
-  const payload = { fn: fnName, args: args };
+async function apiLogin(fn, ...args) {
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload), redirect: 'follow'
-    });
-    if (!res.ok) throw new Error('HTTP Error ' + res.status);
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.error);
-    return json.data;
-  } catch (err) {
-    throw new Error(err.message || String(err));
-  }
+    const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({fn, args}) });
+    const j = await res.json(); if(!j.ok) throw new Error(j.error); return j.data;
+  } catch(e) { throw new Error(e.message); }
 }
 
-// =================================================================
-// LOADERS
-// =================================================================
-async function loadData() {
-  try {
-    const data = await api('getInitialData');
-    S.students = data.students || [];
-    S.rules = data.pointRules || [];
-  } catch (err) { S.error = err.message; }
-}
-async function loadDashboard() {
-  try { S.dashboard = await api('getDashboardData'); } catch (e) { S.dashboard = null; }
-}
-async function loadAbsensi() {
-  try {
-    const res = await api('getAttendanceByDate', S.absenTanggal);
-    S.absenData = {};
-    S.students.forEach(s => { S.absenData[s.id] = { status: 'Hadir', keterangan: '' }; });
-    res.forEach(r => { S.absenData[r.studentId] = { status: r.status, keterangan: r.keterangan }; });
-  } catch (e) { showToast(e.message, 'error'); }
-}
-async function loadRekap() {
-  S.loading = true; render();
-  try { S.rekapData = await api('getRekapKehadiran', S.rekapBulan, S.rekapTahun); } catch (e) { showToast(e.message, 'error'); }
-  S.loading = false; render();
-}
-async function loadRiwayat() {
-  S.loading = true; render();
-  try { S.riwayatData = await api('getLogPoin', 100); } catch (e) { showToast(e.message, 'error'); }
-  S.loading = false; render();
-}
-async function loadRapor() {
-  if (!S.raporStudent) return showToast('Pilih santri dulu!', 'warn');
-  S.loading = true; render();
-  try { S.raporData = await api('getRaporSantri', S.raporStudent, S.raporBulan, S.raporTahun); } catch (e) { showToast(e.message, 'error'); }
-  S.loading = false; render();
-}
+// ================= LOADERS =================
+async function loadData() { try { const d = await api('getInitialData'); S.students=d.students||[]; S.rules=d.pointRules||[]; } catch(e){ S.error=e.message; } }
+async function loadDashboard() { try { S.dashboard = await api('getDashboardData'); } catch(e){} }
+async function loadAbsensi() { try { const r = await api('getAttendanceByDate', S.absenTanggal); S.absenData={}; S.students.forEach(s=>S.absenData[s.id]={status:'Hadir',keterangan:''}); r.forEach(x=>S.absenData[x.studentId]={status:x.status,keterangan:x.keterangan}); } catch(e){} }
+async function loadRekap() { S.loading=true; render(); try { S.rekapData = await api('getRekapKehadiran', S.rekapBulan, S.rekapTahun, S.filterKelas); } catch(e){} S.loading=false; render(); }
+async function loadRekapSetoran() { S.loading=true; render(); try { S.rekapSetoranData = await api('getRekapSetoran', S.rekapTanggal); } catch(e){} S.loading=false; render(); }
+async function loadRapor() { if(!S.raporStudent) return showToast('Pilih santri','warn'); S.loading=true; render(); try { S.raporData = await api('getRaporSantri', S.raporStudent, S.raporBulan, S.raporTahun); } catch(e){} S.loading=false; render(); }
 
-// =================================================================
-// ACTIONS
-// =================================================================
-async function doLoginAdmin() {
-  S.loginError = ''; S.isLoggingIn = true; render();
+// ================= ACTIONS =================
+async function doLogin() {
+  S.loginError=''; S.isLoggingIn=true; render();
   try {
-    const res = await apiLogin('loginAdmin', S.loginUser, S.loginPass);
-    sessionStorage.clear(); setToken(res.token);
-    S.user = { role: res.role, data: res.data }; saveUser(S.user);
-    S.view = 'dashboard'; await loadData();
-  } catch (err) { S.loginError = err.message; }
-  S.isLoggingIn = false; render();
+    const res = S.loginView==='admin' ? await apiLogin('loginAdmin', S.loginUser, S.loginPass) : await apiLogin('loginSantri', S.loginStudent, S.loginPass);
+    sessionStorage.clear(); setToken(res.token); S.user={role:res.role,data:res.data}; saveUser(S.user); S.view='dashboard'; await loadData();
+  } catch(e) { S.loginError=e.message; }
+  S.isLoggingIn=false; render();
 }
-async function doLoginSantri() {
-  S.loginError = ''; S.isLoggingIn = true; render();
-  try {
-    const res = await apiLogin('loginSantri', S.loginStudent, S.loginPass);
-    sessionStorage.clear(); setToken(res.token);
-    S.user = { role: res.role, data: res.data }; saveUser(S.user);
-    S.view = 'dashboard'; await loadData();
-  } catch (err) { S.loginError = err.message; }
-  S.isLoggingIn = false; render();
-}
-async function doLogout() {
-  try { await api('logoutUser'); } catch(e){}
-  sessionStorage.clear(); S.user = null; S.view = 'dashboard'; S.loginView = 'selection'; render();
-}
-
+async function doLogout() { try { await api('logoutUser'); } catch(e){} sessionStorage.clear(); S.user=null; render(); }
 async function submitAbsen() {
-  S.submitting = true; render();
+  S.submitting=true; render();
   try {
-    const records = Object.keys(S.absenData).map(id => ({
-      studentId: parseInt(id),
-      status: S.absenData[id].status,
-      keterangan: S.absenData[id].keterangan || ''
-    }));
-    const res = await api('saveAttendance', { tanggal: S.absenTanggal, records });
-    showToast(`✅ Kehadiran tersimpan (${res.jumlah} santri). Hadir dapat +${res.poinOtomatis} poin.`, 'success');
-    await loadData(); // Refresh poin
-  } catch (err) { showToast(err.message, 'error'); }
-  S.submitting = false; render();
+    const recs = Object.keys(S.absenData).map(id=>({studentId:parseInt(id), status:S.absenData[id].status, keterangan:S.absenData[id].keterangan||''}));
+    await api('saveAttendance', {tanggal:S.absenTanggal, records:recs}); showToast('✅ Tersimpan','success'); await loadData();
+  } catch(e){ showToast(e.message,'error'); } S.submitting=false; render();
 }
-
-async function submitPoinMulti() {
-  if (!S.selectedStudents.length) return showToast('Pilih minimal 1 santri!', 'warn');
-  const ruleIds = Object.keys(S.selectedRules);
-  if (!ruleIds.length) return showToast('Pilih minimal 1 aktivitas!', 'warn');
-  S.submitting = true; render();
+async function submitPoin() {
+  if(!S.selectedStudents.length) return showToast('Pilih santri','warn');
+  S.submitting=true; render();
   try {
-    const rulesList = ruleIds.map(id => ({ ruleId: parseInt(id), multiplier: S.selectedRules[id] || 1 }));
-    const res = await api('savePointsMulti', S.selectedStudents, rulesList);
-    showToast(`✅ ${res.updated} santri diperbarui (Total: ${res.totalPoints > 0 ? '+' : ''}${res.totalPoints} poin)`, 'success');
-    S.selectedStudents = []; S.selectedRules = {}; await loadData();
-  } catch (err) { showToast(err.message, 'error'); }
-  S.submitting = false; render();
+    if(S.poinTab==='aturan') {
+      if(!Object.keys(S.selectedRules).length) throw new Error('Pilih aktivitas');
+      const rl = Object.keys(S.selectedRules).map(id=>({ruleId:parseInt(id), multiplier:S.selectedRules[id]||1}));
+      await api('savePointsMulti', S.selectedStudents, rl);
+    } else {
+      if(isNaN(parseInt(S.customAmount))) throw new Error('Poin tidak valid');
+      await api('saveCustomPoints', S.selectedStudents, parseInt(S.customAmount), S.customNote);
+    }
+    showToast('✅ Poin tersimpan','success'); S.selectedStudents=[]; S.selectedRules={}; S.customAmount=''; await loadData();
+  } catch(e){ showToast(e.message,'error'); } S.submitting=false; render();
 }
-
-async function submitPoinCustom() {
-  if (!S.selectedStudents.length) return showToast('Pilih minimal 1 santri!', 'warn');
-  const amt = parseInt(S.customAmount, 10);
-  if (isNaN(amt)) return showToast('Isi jumlah poin!', 'warn');
-  S.submitting = true; render();
-  try {
-    const res = await api('saveCustomPoints', S.selectedStudents, amt, S.customNote);
-    showToast(`✅ ${res.updated} santri diperbarui (${amt > 0 ? '+' : ''}${amt} poin)`, 'success');
-    S.selectedStudents = []; S.customAmount = ''; S.customNote = ''; await loadData();
-  } catch (err) { showToast(err.message, 'error'); }
-  S.submitting = false; render();
-}
-
 async function submitSetoran(e) {
   e.preventDefault();
-  if (!S.setoranData.studentId) return showToast('Pilih Santri!', 'warn');
-  if (!S.setoranData.detail) return showToast('Isi detail setoran!', 'warn');
-  S.submitting = true; render();
+  if(!S.setoranData.studentIds.length) return showToast('Pilih minimal 1 santri','warn');
+  let detail = S.setoranData.detailManual;
+  if(S.setoranData.tipe==='Bacaan') {
+    if(S.setoranData.subTipe.includes('Iqra')) detail = `Jilid ${S.setoranData.jilid}, Hal ${S.setoranData.halaman}`;
+    if(S.setoranData.subTipe==='Al-Quran') detail = `Juz ${S.setoranData.juz}, ${S.setoranData.surah} Ayat ${S.setoranData.ayatStart}-${S.setoranData.ayatEnd}`;
+  } else {
+    detail = S.setoranData.detailManual;
+  }
+  if(!detail || detail.includes('undefined') || detail.includes('null')) return showToast('Lengkapi detail setoran','warn');
+  
+  S.submitting=true; render();
   try {
-    await api('saveSetoran', S.setoranData);
-    showToast('✅ Setoran berhasil disimpan!', 'success');
-    S.setoranData = { studentId: '', jenis: 'Iqra', detail: '', status: 'Lancar', catatan: '' };
-  } catch (err) { showToast(err.message, 'error'); }
-  S.submitting = false; render();
+    await api('saveSetoranMassal', {
+      studentIds: S.setoranData.studentIds, tipe: S.setoranData.tipe, subTipe: S.setoranData.subTipe,
+      detail: detail, status: S.setoranData.status, catatan: S.setoranData.catatan
+    });
+    showToast(`✅ Setoran disimpan untuk ${S.setoranData.studentIds.length} santri`,'success');
+    S.setoranData.studentIds=[]; render();
+  } catch(e){ showToast(e.message,'error'); } S.submitting=false; render();
 }
 
-async function submitAddSantri(e) {
-  e.preventDefault();
-  S.submitting = true; render();
-  try {
-    const payload = { name: S.editingSantri.name, kelas: S.editingSantri.kelas, pin: S.editingSantri.pin };
-    if (S.editingSantri.id) {
-      await api('updateSantri', S.editingSantri.id, payload);
-      showToast('✅ Data santri diperbarui', 'success');
-    } else {
-      const res = await api('addSantri', payload);
-      showToast(`✅ Santri ditambah. PIN: ${res.pin}`, 'success');
-    }
-    S.editingSantri = null; await loadData();
-  } catch (err) { showToast(err.message, 'error'); }
-  S.submitting = false; render();
-}
-
-async function submitAddAturan(e) {
-  e.preventDefault();
-  S.submitting = true; render();
-  try {
-    await api('addAturan', S.newAturan);
-    showToast('✅ Aturan ditambah', 'success');
-    S.newAturan = { name: '', points: 1 }; await loadData();
-  } catch (err) { showToast(err.message, 'error'); }
-  S.submitting = false; render();
-}
-
-async function shareRaporWA() {
-  if (!S.raporData) return;
-  try {
-    const res = await api('generateRaporText', S.raporStudent, S.raporBulan, S.raporTahun);
-    const url = 'https://wa.me/?text=' + encodeURIComponent(res.text);
-    window.open(url, '_blank');
-  } catch (err) { showToast(err.message, 'error'); }
-}
-
-// =================================================================
-// RENDER COMPONENTS
-// =================================================================
+// ================= RENDER =================
 function render() {
   const app = document.getElementById('app');
-  if (S.loading) {
-    app.innerHTML = `<div class="min-h-screen flex items-center justify-center bg-yellow-50"><div class="text-center"><div class="text-5xl mb-4 animate-bounce">📖</div><p class="font-bold text-gray-500">Memuat...</p></div></div>`;
-    return;
-  }
-  if (!S.user) { app.innerHTML = renderLogin(); return; }
+  if(S.loading) return app.innerHTML = '<div class="min-h-screen flex items-center justify-center font-bold text-amber-500">Memuat...</div>';
+  if(!S.user) return app.innerHTML = renderLogin();
+  
+  const fStudents = S.students.filter(s => !S.filterKelas || s.kelas === S.filterKelas);
+  const kList = [...new Set(S.students.map(s=>s.kelas))];
 
   app.innerHTML = `
-    <div class="min-h-screen p-3 pb-20" style="background:linear-gradient(180deg,#fef9f3 0%,#fef3c7 100%);">
-      <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-4 bg-white p-3 rounded-2xl shadow-sm border-2 border-yellow-100">
-          <div class="flex items-center gap-2">
-            <span class="text-2xl">📖</span>
-            <div>
-              <div class="font-bold text-gray-800 leading-tight">TPQ Bani Saleh</div>
-              <div class="text-xs text-gray-500">${esc(S.user.data.name)} (${S.user.role})</div>
-            </div>
-          </div>
-          <button onclick="doLogout()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-2 rounded-xl border border-red-100">Keluar</button>
+    <div class="min-h-screen pb-20 p-3 max-w-4xl mx-auto">
+      <div class="flex justify-between items-center mb-3 bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+        <div>
+          <div class="font-bold text-gray-800">TPQ Bani Saleh</div>
+          <div class="text-xs text-gray-500">${esc(S.user.data.name)}</div>
         </div>
-        
-        <!-- Navigation (Scrollable) -->
-        <div class="flex gap-2 overflow-x-auto pb-3 hide-scroll mb-2">
-          ${renderNavBtn('dashboard', '🏠 Dashboard')}
-          ${S.user.role === 'admin' ? `
-            ${renderNavBtn('absensi', '⚡ Absensi')}
-            ${renderNavBtn('poin', '🎯 Input Poin')}
-            ${renderNavBtn('setoran', '📖 Setoran')}
-            ${renderNavBtn('rapor', '📝 Rapor')}
-            ${renderNavBtn('rekap', '📊 Rekap')}
-            ${renderNavBtn('klasemen', '🏆 Klasemen')}
-            ${renderNavBtn('riwayat', '📋 Riwayat')}
-            ${renderNavBtn('santri', '👥 Santri')}
-            ${renderNavBtn('pengaturan', '⚙️ Pengaturan')}
-          ` : `
-            ${renderNavBtn('rapor_santri', '📝 Raporku')}
-          `}
+        <div class="flex items-center gap-2">
+          <select onchange="S.filterKelas=this.value;render()" class="bg-gray-50 border rounded-lg px-2 py-1 text-xs font-bold">
+            <option value="">Semua Kelas</option>
+            ${kList.map(k=>`<option value="${k}" ${S.filterKelas===k?'selected':''}>${k}</option>`).join('')}
+          </select>
+          <button onclick="doLogout()" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-lg font-bold">Keluar</button>
         </div>
+      </div>
 
-        <!-- Main Content -->
-        <div class="fade-in">
-          ${renderView()}
-        </div>
+      <div class="flex gap-1 overflow-x-auto hide-scroll pb-2 mb-3">
+        ${navBtn('dashboard','🏠')} ${navBtn('absensi','⚡ Absen')} ${navBtn('poin','🎯 Poin')} ${navBtn('setoran','📖 Setoran')}
+        ${navBtn('rapor','📝 Rapor')} ${navBtn('rekap','📊 Rekap')} ${navBtn('klasemen','🏆 Klasemen')} ${navBtn('santri','👥 Santri')} ${navBtn('pengaturan','⚙️ Set')}
+      </div>
+
+      <div class="fade-in">
+        ${S.view==='dashboard' ? viewDashboard(fStudents) : ''}
+        ${S.view==='absensi' ? viewAbsensi(fStudents) : ''}
+        ${S.view==='poin' ? viewPoin(fStudents) : ''}
+        ${S.view==='setoran' ? viewSetoran(fStudents) : ''}
+        ${S.view==='rapor' ? viewRapor() : ''}
+        ${S.view==='rekap' ? viewRekap() : ''}
+        ${S.view==='klasemen' ? viewKlasemen(fStudents) : ''}
+        ${S.view==='santri' ? viewSantri() : ''}
+        ${S.view==='pengaturan' ? viewPengaturan() : ''}
       </div>
     </div>
   `;
 }
+const navBtn = (v, l) => `<button onclick="goto('${v}')" class="px-3 py-1.5 rounded-lg font-bold text-xs whitespace-nowrap ${S.view===v?'bg-amber-400 text-white shadow':'bg-white text-gray-600'}">${l}</button>`;
+async function goto(v) { S.view=v; if(v==='dashboard')await loadDashboard(); if(v==='absensi')await loadAbsensi(); if(v==='rekap')await loadRekap(); render(); }
 
-function renderNavBtn(view, label) {
-  const active = S.view === view;
-  return `<button onclick="goto('${view}')" class="px-4 py-2 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${active ? 'bg-amber-400 text-white shadow-md transform scale-105' : 'bg-white text-gray-600 shadow-sm'}">${label}</button>`;
-}
-
-function renderView() {
-  switch (S.view) {
-    case 'dashboard': return viewDashboard();
-    case 'absensi': return viewAbsensi();
-    case 'poin': return viewPoin();
-    case 'setoran': return viewSetoran();
-    case 'rapor': return viewRapor();
-    case 'rapor_santri': return viewRapor(true);
-    case 'rekap': return viewRekap();
-    case 'klasemen': return viewKlasemen();
-    case 'riwayat': return viewRiwayat();
-    case 'santri': return viewSantri();
-    case 'pengaturan': return viewPengaturan();
-    default: return viewDashboard();
-  }
-}
-
-// =================================================================
-// VIEWS
-// =================================================================
+// ================= VIEWS =================
 function renderLogin() {
-  let content = '';
-  if (S.loginError) content += `<div class="bg-red-100 text-red-700 p-3 rounded-xl mb-4 text-sm font-bold">${esc(S.loginError)}</div>`;
-  
-  if (S.loginView === 'selection') {
-    content = `
-      <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-amber-600">TPQ Bani Saleh</h1>
-        <p class="text-gray-500 text-sm">Silakan pilih mode masuk</p>
-      </div>
-      <div class="space-y-3">
-        <button onclick="S.loginView='admin';render();" class="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-blue-600">👨‍🏫 Masuk Guru</button>
-        <button onclick="S.loginView='santri';render();" class="w-full bg-green-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-green-600">⭐ Masuk Santri</button>
-      </div>
-    `;
-  } else if (S.loginView === 'admin') {
-    content = `
-      <form onsubmit="event.preventDefault();doLoginAdmin();" class="space-y-4">
-        <div class="text-center mb-4"><span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full font-bold text-sm">Mode Guru</span></div>
-        <input type="text" value="${esc(S.loginUser)}" oninput="S.loginUser=this.value" placeholder="Username" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3" />
-        <input type="password" value="${esc(S.loginPass)}" oninput="S.loginPass=this.value" placeholder="Password" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3" />
-        <button type="submit" class="w-full bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg">Masuk</button>
-        <button type="button" onclick="S.loginView='selection';render();" class="w-full text-gray-500 font-bold py-2">Kembali</button>
-      </form>
-    `;
-  } else if (S.loginView === 'santri') {
-    let opts = '<option value="">-- Pilih Namamu --</option>';
-    S.students.forEach(s => { opts += `<option value="${s.id}">${esc(s.name)}</option>`; });
-    content = `
-      <form onsubmit="event.preventDefault();doLoginSantri();" class="space-y-4">
-        <div class="text-center mb-4"><span class="bg-green-100 text-green-700 px-4 py-1 rounded-full font-bold text-sm">Mode Santri</span></div>
-        <select required onchange="S.loginStudent=this.value" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3">${opts}</select>
-        <input type="password" value="${esc(S.loginPass)}" oninput="S.loginPass=this.value" placeholder="PIN Rahasia" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-center tracking-widest" maxlength="6" />
-        <button type="submit" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg">Masuk</button>
-        <button type="button" onclick="S.loginView='selection';render();" class="w-full text-gray-500 font-bold py-2">Kembali</button>
-      </form>
-    `;
-  }
-  return `<div class="min-h-screen flex items-center justify-center p-4"><div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm border-4 border-yellow-100 fade-in">${content}</div></div>`;
+  let c = '';
+  if(S.loginView==='selection') c = `
+    <button onclick="S.loginView='admin';render()" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl mb-2">Masuk Guru</button>
+    <button onclick="S.loginView='santri';render()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl">Masuk Santri</button>
+  `;
+  else c = `
+    <form onsubmit="event.preventDefault();doLogin()" class="space-y-3">
+      ${S.loginView==='admin' ? `<input type="text" oninput="S.loginUser=this.value" placeholder="Username" required class="w-full border-2 rounded-xl p-3">` : `<input type="number" oninput="S.loginStudent=this.value" placeholder="ID Santri" required class="w-full border-2 rounded-xl p-3">`}
+      <input type="password" oninput="S.loginPass=this.value" placeholder="Password / PIN" required class="w-full border-2 rounded-xl p-3">
+      <button type="submit" class="w-full bg-amber-400 text-white font-bold py-3 rounded-xl">Masuk</button>
+      <button type="button" onclick="S.loginView='selection';render()" class="w-full text-gray-500 font-bold py-1">Kembali</button>
+    </form>
+  `;
+  return `<div class="min-h-screen flex items-center justify-center p-4"><div class="bg-white p-6 rounded-3xl shadow-xl w-full max-w-sm border-4 border-yellow-100"><h1 class="text-center text-xl font-bold text-amber-500 mb-4">TPQ Bani Saleh</h1>${S.loginError?`<div class="text-red-500 text-sm mb-2 text-center">${S.loginError}</div>`:''}${c}</div></div>`;
 }
 
-async function goto(view) {
-  S.view = view;
-  if (view === 'dashboard') await loadDashboard();
-  if (view === 'absensi') await loadAbsensi();
-  if (view === 'rekap') await loadRekap();
-  if (view === 'riwayat') await loadRiwayat();
-  if (view === 'rapor' || view === 'rapor_santri') { S.raporData = null; }
-  render();
-}
-
-function viewDashboard() {
-  if (!S.dashboard) { loadDashboard().then(render); return 'Memuat...'; }
+function viewDashboard(fS) {
+  if(!S.dashboard) return 'Memuat...';
   const d = S.dashboard;
-  
-  let top5Html = d.top5.map((s,i) => `
-    <div class="flex items-center gap-3 bg-white p-2 rounded-xl mb-1 border border-gray-100">
-      <div class="font-bold text-lg w-6 text-center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
-      <div class="flex-1 font-bold text-gray-700 text-sm truncate">${esc(s.name)}</div>
-      <div class="font-black text-blue-600">${s.points}</div>
-    </div>
-  `).join('');
-
-  let belumHtml = d.belumHadir.map(s => `<span class="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-lg text-xs font-bold mr-1 mb-1">${esc(s.name)}</span>`).join('');
-  if (!belumHtml) belumHtml = '<span class="text-green-600 text-sm font-bold">✅ Semua santri sudah absen hari ini!</span>';
-
   return `
-    <div class="space-y-4">
-      <!-- Stats -->
-      <div class="grid grid-cols-2 gap-3">
-        <div class="bg-white p-4 rounded-2xl border-b-4 border-blue-200 shadow-sm text-center">
-          <div class="text-3xl mb-1">👥</div>
-          <div class="text-2xl font-black text-blue-600">${d.totalSantri}</div>
-          <div class="text-xs text-gray-500 font-bold">Total Santri</div>
-        </div>
-        <div class="bg-white p-4 rounded-2xl border-b-4 border-green-200 shadow-sm text-center">
-          <div class="text-3xl mb-1">✅</div>
-          <div class="text-2xl font-black text-green-600">${d.totalHadir}</div>
-          <div class="text-xs text-gray-500 font-bold">Hadir Hari Ini</div>
-        </div>
-      </div>
-
-      <!-- Aksi Cepat -->
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="goto('absensi')" class="bg-gradient-to-r from-amber-400 to-orange-400 text-white p-4 rounded-2xl font-bold shadow-md text-left">
-          <div class="text-xl">⚡</div>
-          <div>Absen Cepat</div>
-        </button>
-        <button onclick="goto('poin')" class="bg-gradient-to-r from-purple-400 to-indigo-400 text-white p-4 rounded-2xl font-bold shadow-md text-left">
-          <div class="text-xl">🎯</div>
-          <div>Input Poin</div>
-        </button>
-      </div>
-
-      <!-- Belum Hadir -->
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <h3 class="font-bold text-gray-800 mb-2 border-b pb-2">Belum Absen Hari Ini</h3>
-        <div>${belumHtml}</div>
-      </div>
-
-      <!-- Top 5 -->
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <h3 class="font-bold text-gray-800 mb-2 border-b pb-2">🏆 5 Poin Tertinggi</h3>
-        <div>${top5Html}</div>
-      </div>
+    <div class="grid grid-cols-2 gap-2 mb-3">
+      <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400"><div class="text-2xl font-black text-blue-600">${d.totalSantri}</div><div class="text-xs font-bold text-gray-500">Total Santri</div></div>
+      <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-400"><div class="text-2xl font-black text-green-600">${d.totalHadir}</div><div class="text-xs font-bold text-gray-500">Hadir Hari Ini</div></div>
+    </div>
+    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3">
+      <h3 class="font-bold text-sm text-gray-700 mb-2">Belum Absen:</h3>
+      <div class="flex flex-wrap gap-1">${d.belumHadir.map(s=>`<span class="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold">${esc(s.name)}</span>`).join('') || '<span class="text-green-600 text-xs font-bold">Semua Hadir!</span>'}</div>
     </div>
   `;
 }
 
-function viewAbsensi() {
-  let cards = S.students.map(s => {
-    const d = S.absenData[s.id] || { status: 'Hadir', keterangan: '' };
-    return `
-      <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-2">
-        <div class="font-bold text-gray-800 text-sm truncate">${esc(s.name)}</div>
-        <div class="grid grid-cols-4 gap-1">
-          ${['Hadir','Sakit','Izin','Alfa'].map(st => `
-            <button onclick="S.absenData[${s.id}].status='${st}';render();" class="status-btn status-${st.toLowerCase()} ${d.status===st?'active':''}">${st}</button>
-          `).join('')}
-        </div>
-        ${d.status !== 'Hadir' ? `<input type="text" value="${esc(d.keterangan)}" oninput="S.absenData[${s.id}].keterangan=this.value" placeholder="Keterangan..." class="w-full bg-gray-50 border rounded-lg px-2 py-1 text-xs" />` : ''}
+function viewAbsensi(fS) {
+  let cards = fS.map(s=>{
+    const d = S.absenData[s.id]||{status:'Hadir',keterangan:''};
+    return `<div class="bg-white p-2 rounded-xl shadow-sm border border-gray-100 space-y-1">
+      <div class="font-bold text-sm text-gray-800">${esc(s.name)}</div>
+      <div class="grid grid-cols-4 gap-1">
+        ${['Hadir','Sakit','Izin','Alfa'].map(st=>`<button onclick="S.absenData[${s.id}].status='${st}';render()" class="status-btn status-${st.toLowerCase()} ${d.status===st?'active':''}">${st}</button>`).join('')}
       </div>
-    `;
+      ${d.status!=='Hadir'?`<input type="text" value="${esc(d.keterangan)}" oninput="S.absenData[${s.id}].keterangan=this.value" placeholder="Ket..." class="w-full text-xs border rounded px-2 py-1">`:''}
+    </div>`;
   }).join('');
-
   return `
-    <div class="space-y-4">
-      <div class="bg-gradient-to-r from-emerald-400 to-green-500 p-4 rounded-2xl text-white shadow-md">
-        <h2 class="text-xl font-bold mb-1">Absensi Manual</h2>
-        <p class="text-sm opacity-90">Hadir otomatis dapat +2 poin.</p>
-      </div>
-
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
-        <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Absen</label>
-          <input type="date" value="${S.absenTanggal}" onchange="S.absenTanggal=this.value;loadAbsensi().then(render);" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-2 font-bold" />
-        </div>
-        <div class="flex gap-2">
-          <button onclick="S.students.forEach(s=>S.absenData[s.id]={status:'Hadir',keterangan:''});render();" class="flex-1 bg-green-100 text-green-700 font-bold py-2 rounded-xl text-sm">✅ Semua Hadir</button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto pr-1">
-        ${cards}
-      </div>
-
-      <div class="sticky bottom-4">
-        <button onclick="submitAbsen()" ${S.submitting?'disabled':''} class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-black py-4 rounded-2xl shadow-xl text-lg active:scale-95 transition-transform disabled:opacity-50">
-          ${S.submitting ? 'Menyimpan...' : '💾 SIMPAN KEHADIRAN'}
-        </button>
-      </div>
+    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3 space-y-2">
+      <input type="date" value="${S.absenTanggal}" onchange="S.absenTanggal=this.value;loadAbsensi().then(render)" class="w-full border rounded px-3 py-2 font-bold text-sm">
+      <button onclick="fS.forEach(s=>S.absenData[s.id].status='Hadir');render()" class="w-full bg-green-100 text-green-700 text-xs font-bold py-2 rounded-lg">Set Semua Hadir</button>
     </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3 max-h-[60vh] overflow-y-auto">${cards}</div>
+    <button onclick="submitAbsen()" class="w-full bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg sticky bottom-2">💾 SIMPAN ABSEN</button>
   `;
 }
 
-function viewPoin() {
-  const filtered = S.students.filter(s => s.name.toLowerCase().includes(S.searchTerm.toLowerCase()));
-  const posRules = S.rules.filter(r => r.points >= 0);
-  const negRules = S.rules.filter(r => r.points < 0);
-  
-  let ruleBox = (r) => {
-    const isSel = S.selectedRules[r.id] !== undefined;
-    return `
-      <div onclick="if(S.selectedRules[${r.id}])delete S.selectedRules[${r.id}];else S.selectedRules[${r.id}]=1;render();" class="rule-check ${r.points>=0?'rule-pos':'rule-neg'} ${isSel?'selected':''}">
-        <div class="rule-checkbox">${isSel?'<span class="rule-checkbox-inner">✓</span>':''}</div>
-        <div class="flex-1 font-bold text-gray-700 text-sm truncate">${esc(r.name)}</div>
-        <div class="font-black ${r.points>=0?'text-green-600':'text-red-600'}">${r.points>0?'+':''}${r.points}</div>
-      </div>
-    `;
-  };
-
-  let stuList = filtered.map(s => {
+function viewPoin(fS) {
+  let rules = S.rules.map(r=>{
+    const sel = S.selectedRules[r.id]!==undefined;
+    return `<div onclick="if(sel)delete S.selectedRules[${r.id}];else S.selectedRules[${r.id}]=1;render()" class="flex items-center justify-between p-2 rounded-lg border-2 cursor-pointer ${sel?'bg-blue-50 border-blue-400':'bg-gray-50 border-transparent'}">
+      <div class="text-xs font-bold text-gray-700">${esc(r.name)}</div>
+      <div class="text-xs font-black ${r.points>0?'text-green-600':'text-red-600'}">${r.points>0?'+':''}${r.points}</div>
+    </div>`;
+  }).join('');
+  let stus = fS.map(s=>{
     const sel = S.selectedStudents.includes(s.id);
-    return `
-      <div onclick="if(S.selectedStudents.includes(${s.id}))S.selectedStudents=S.selectedStudents.filter(id=>id!==${s.id});else S.selectedStudents.push(${s.id});render();" class="flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer ${sel?'bg-blue-50 border-blue-400':'bg-white border-gray-100'}">
-        <div class="font-bold text-gray-800 text-sm truncate">${esc(s.name)}</div>
-        <div class="text-sm font-black ${s.points<0?'text-red-500':'text-green-600'}">${s.points}</div>
+    return `<div onclick="if(sel)S.selectedStudents=S.selectedStudents.filter(i=>i!==${s.id});else S.selectedStudents.push(${s.id});render()" class="flex justify-between p-2 rounded-lg border cursor-pointer ${sel?'bg-blue-50 border-blue-300':'bg-white border-gray-100'}">
+      <div class="text-xs font-bold text-gray-700">${esc(s.name)}</div><div class="text-xs font-bold">${s.points}</div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 h-fit space-y-2">
+        <div class="flex gap-1 mb-2"><button onclick="S.poinTab='aturan';render()" class="flex-1 text-xs font-bold py-1 rounded ${S.poinTab==='aturan'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-500'}">Pilih Aktivitas</button><button onclick="S.poinTab='custom';render()" class="flex-1 text-xs font-bold py-1 rounded ${S.poinTab==='custom'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-500'}">Custom</button></div>
+        ${S.poinTab==='aturan'?`<div class="max-h-[40vh] overflow-y-auto space-y-1">${rules}</div><button onclick="submitPoin()" class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg text-sm mt-2">Terapkan (${S.selectedStudents.length})</button>`:`
+          <input type="number" oninput="S.customAmount=this.value" placeholder="Poin" class="w-full border rounded p-2 text-sm mb-1">
+          <input type="text" oninput="S.customNote=this.value" placeholder="Ket" class="w-full border rounded p-2 text-sm mb-2">
+          <button onclick="submitPoin()" class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg text-sm">Terapkan (${S.selectedStudents.length})</button>
+        `}
       </div>
-    `;
+      <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+        <h3 class="font-bold text-sm text-gray-700 mb-2">Pilih Santri (${S.selectedStudents.length})</h3>
+        <div class="max-h-[50vh] overflow-y-auto space-y-1">${stus}</div>
+      </div>
+    </div>
+  `;
+}
+
+function viewSetoran(fS) {
+  const d = S.setoranData;
+  let juzOpts = ''; for(let i=1; i<=30; i++) juzOpts += `<option value="${i}" ${d.juz==i?'selected':''}>Juz ${i}</option>`;
+  let surahOpts = '<option value="">Pilih Surah</option>'; if(d.juz) JUZ_SURAH[d.juz].forEach(s=>surahOpts+=`<option value="${s}" ${d.surah===s?'selected':''}>${s}</option>`);
+  let ayatOpts = ''; if(d.surah) { const max=SURAH_AYAT[d.surah]||0; for(let i=1; i<=max; i++) ayatOpts+=`<option value="${i}">${i}</option>`; }
+
+  let pilihanSantri = fS.map(s=>{
+    const sel = d.studentIds.includes(s.id);
+    return `<div onclick="if(sel)S.setoranData.studentIds=S.setoranData.studentIds.filter(i=>i!==${s.id});else S.setoranData.studentIds.push(${s.id});render()" class="flex justify-between p-2 rounded-lg border cursor-pointer ${sel?'bg-green-50 border-green-300':'bg-white border-gray-100'}">
+      <div class="text-xs font-bold text-gray-700">${esc(s.name)}</div>
+    </div>`;
   }).join('');
 
   return `
-    <div class="space-y-4">
-      <div class="flex gap-2 bg-white p-1 rounded-xl shadow-sm">
-        <button onclick="S.poinTab='aturan';render();" class="flex-1 py-2 rounded-lg font-bold text-sm ${S.poinTab==='aturan'?'bg-amber-100 text-amber-700':'text-gray-500'}">Aturan Cepat</button>
-        <button onclick="S.poinTab='custom';render();" class="flex-1 py-2 rounded-lg font-bold text-sm ${S.poinTab==='custom'?'bg-amber-100 text-amber-700':'text-gray-500'}">Custom +/-</button>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Kiri: Form -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 h-fit space-y-4">
-          ${S.poinTab === 'aturan' ? `
-            <div>
-              <h4 class="font-bold text-green-700 text-sm mb-2">✅ Poin Reward</h4>
-              <div class="space-y-1">${posRules.map(ruleBox).join('')}</div>
-            </div>
-            <div>
-              <h4 class="font-bold text-red-700 text-sm mb-2">⚠ Poin Hukuman</h4>
-              <div class="space-y-1">${negRules.map(ruleBox).join('')}</div>
-            </div>
-            <button onclick="submitPoinMulti()" ${S.submitting?'disabled':''} class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl mt-2 disabled:opacity-50">Terapkan ke ${S.selectedStudents.length} Santri</button>
-          ` : `
-            <h4 class="font-bold text-gray-800 mb-2">Custom Poin</h4>
-            <input type="number" value="${S.customAmount}" oninput="S.customAmount=this.value" placeholder="Contoh: 3 atau -2" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 font-bold text-lg mb-2" />
-            <input type="text" value="${S.customNote}" oninput="S.customNote=this.value" placeholder="Keterangan (opsional)" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 mb-4" />
-            <button onclick="submitPoinCustom()" ${S.submitting?'disabled':''} class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl disabled:opacity-50">Terapkan ke ${S.selectedStudents.length} Santri</button>
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3">
+      <h2 class="font-bold text-lg text-gray-800">📖 Input Setoran (Massal)</h2>
+      <div class="grid grid-cols-2 gap-2">
+        <select onchange="S.setoranData.tipe=this.value;render()" class="border rounded p-2 text-sm font-bold">
+          <option value="Bacaan" ${d.tipe==='Bacaan'?'selected':''}>Bacaan</option>
+          <option value="Hafalan" ${d.tipe==='Hafalan'?'selected':''}>Hafalan</option>
+        </select>
+        <select onchange="S.setoranData.subTipe=this.value;render()" class="border rounded p-2 text-sm font-bold">
+          ${d.tipe==='Bacaan'?`
+            <option value="Iqra Hitam" ${d.subTipe==='Iqra Hitam'?'selected':''}>Iqra Hitam</option>
+            <option value="Iqra Hijau" ${d.subTipe==='Iqra Hijau'?'selected':''}>Iqra Hijau</option>
+            <option value="Al-Quran" ${d.subTipe==='Al-Quran'?'selected':''}>Al-Quran</option>
+          `:`
+            <option value="Hafalan Surah" ${d.subTipe==='Hafalan Surah'?'selected':''}>Hafalan Surah</option>
+            <option value="Hafalan Doa" ${d.subTipe==='Hafalan Doa'?'selected':''}>Hafalan Doa</option>
           `}
-        </div>
-
-        <!-- Kanan: List Santri -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          <div class="flex justify-between items-center mb-3">
-            <h4 class="font-bold text-gray-800">Pilih Santri</h4>
-            <input type="text" value="${S.searchTerm}" oninput="S.searchTerm=this.value;render();" placeholder="Cari..." class="bg-gray-50 border rounded-lg px-2 py-1 text-sm w-24" />
-          </div>
-          <div class="space-y-1 max-h-[50vh] overflow-y-auto pr-1">${stuList || 'Tidak ada santri'}</div>
-        </div>
+        </select>
       </div>
-    </div>
-  `;
-}
-
-function viewSetoran() {
-  let opts = '<option value="">-- Pilih Santri --</option>';
-  S.students.forEach(s => { opts += `<option value="${s.id}" ${S.setoranData.studentId==s.id?'selected':''}>${esc(s.name)}</option>`; });
-
-  return `
-    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-      <h2 class="text-xl font-bold mb-4 border-b pb-2">📖 Input Setoran</h2>
-      <form onsubmit="submitSetoran(event)" class="space-y-4">
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-1">Santri</label>
-          <select required onchange="S.setoranData.studentId=this.value" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3">${opts}</select>
+      
+      ${d.tipe==='Bacaan' && d.subTipe.includes('Iqra') ? `
+        <div class="grid grid-cols-2 gap-2">
+          <select onchange="S.setoranData.jilid=this.value" class="border rounded p-2 text-sm">${[1,2,3,4,5,6].map(n=>`<option value="${n}" ${d.jilid==n?'selected':''}>Jilid ${n}</option>`).join('')}</select>
+          <input type="number" oninput="S.setoranData.halaman=this.value" value="${d.halaman}" placeholder="Halaman" class="border rounded p-2 text-sm">
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">Jenis</label>
-            <select required onchange="S.setoranData.jenis=this.value" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3">
-              <option value="Iqra">Iqra</option>
-              <option value="Al-Qur'an">Al-Qur'an</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">Status</label>
-            <select required onchange="S.setoranData.status=this.value" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3">
-              <option value="Lancar">Lancar ✅</option>
-              <option value="Tidak Lancar">Tidak Lancar ❌</option>
-            </select>
+      ` : ''}
+
+      ${d.tipe==='Bacaan' && d.subTipe==='Al-Quran' ? `
+        <div class="space-y-2">
+          <select onchange="S.setoranData.juz=this.value;S.setoranData.surah='';render()" class="w-full border rounded p-2 text-sm">${juzOpts}</select>
+          <select onchange="S.setoranData.surah=this.value;render()" class="w-full border rounded p-2 text-sm">${surahOpts}</select>
+          <div class="grid grid-cols-2 gap-2">
+            <select onchange="S.setoranData.ayatStart=this.value" class="border rounded p-2 text-sm"><option value="">Dari Ayat</option>${ayatOpts}</select>
+            <select onchange="S.setoranData.ayatEnd=this.value" class="border rounded p-2 text-sm"><option value="">Sampai Ayat</option>${ayatOpts}</select>
           </div>
         </div>
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-1">Detail</label>
-          <input type="text" required value="${esc(S.setoranData.detail)}" oninput="S.setoranData.detail=this.value" placeholder="Contoh: Jilid 2 hal 15 / Surah An-Nas 1-5" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3" />
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-1">Catatan (opsional)</label>
-          <textarea rows="2" oninput="S.setoranData.catatan=this.value" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3">${esc(S.setoranData.catatan)}</textarea>
-        </div>
-        <button type="submit" ${S.submitting?'disabled':''} class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-md disabled:opacity-50">💾 Simpan Setoran</button>
-      </form>
-    </div>
-  `;
-}
+      ` : ''}
 
-function viewRapor(isSantri = false) {
-  let opts = '<option value="">-- Pilih Santri --</option>';
-  const studentList = isSantri ? S.students.filter(s => s.id === S.user.data.id) : S.students;
-  studentList.forEach(s => { opts += `<option value="${s.id}" ${S.raporStudent==s.id?'selected':''}>${esc(s.name)} (${esc(s.kelas)})</option>`; });
-  
-  let bulanOpts = BULAN.map((b,i) => `<option value="${i+1}" ${S.raporBulan==i+1?'selected':''}>${b}</option>`).join('');
+      ${d.tipe==='Hafalan' ? `
+        <input type="text" oninput="S.setoranData.detailManual=this.value" value="${d.detailManual}" placeholder="Detail (Cth: Surah An-Nas / Doa Masuk WC)" class="w-full border rounded p-2 text-sm">
+      ` : ''}
 
-  let html = '';
-  if (S.raporData) {
-    const r = S.raporData;
-    let setoranRows = r.setoranTerakhir.map(s => `
-      <tr class="border-b border-gray-100">
-        <td class="p-2 text-xs">${new Date(s.waktu).toLocaleDateString('id-ID')}</td>
-        <td class="p-2 text-sm font-bold">${esc(s.jenis)}</td>
-        <td class="p-2 text-sm">${esc(s.detail)}</td>
-        <td class="p-2 text-xs font-bold ${s.status==='Lancar'?'text-green-600':'text-red-600'}">${esc(s.status)}</td>
-      </tr>
-    `).join('');
-    if (!setoranRows) setoranRows = '<tr><td colspan="4" class="p-4 text-center text-gray-400">Belum ada setoran</td></tr>';
-
-    html = `
-      <div class="bg-white p-5 rounded-2xl shadow-sm border-2 border-amber-200 mt-4 fade-in" id="print-area">
-        <div class="text-center border-b-2 border-dashed pb-4 mb-4">
-          <h2 class="text-xl font-black text-amber-600">RAPOR SANTRI</h2>
-          <p class="text-sm text-gray-500">TPQ Bani Saleh Cicadas</p>
-          <p class="text-xs font-bold text-gray-600 mt-1">Periode: ${BULAN[r.periode.bulan-1]} ${r.periode.tahun}</p>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
-          <div class="text-gray-500">Nama Santri</div><div class="font-bold">: ${esc(r.student.name)}</div>
-          <div class="text-gray-500">Kelas</div><div class="font-bold">: ${esc(r.student.kelas)}</div>
-          <div class="text-gray-500">Peringkat</div><div class="font-bold text-amber-600">: #${r.rank} dari ${r.totalSantri}</div>
-          <div class="text-gray-500">Poin Bulan Ini</div><div class="font-black text-blue-600 text-lg">: ${r.totalPoinBulan}</div>
-        </div>
-
-        <div class="grid grid-cols-4 gap-2 mb-6">
-          <div class="bg-green-50 rounded-xl p-2 text-center border border-green-100"><div class="text-xl font-bold text-green-600">${r.hadir}</div><div class="text-[10px] text-green-800 font-bold">Hadir</div></div>
-          <div class="bg-amber-50 rounded-xl p-2 text-center border border-amber-100"><div class="text-xl font-bold text-amber-600">${r.sakit}</div><div class="text-[10px] text-amber-800 font-bold">Sakit</div></div>
-          <div class="bg-blue-50 rounded-xl p-2 text-center border border-blue-100"><div class="text-xl font-bold text-blue-600">${r.izin}</div><div class="text-[10px] text-blue-800 font-bold">Izin</div></div>
-          <div class="bg-red-50 rounded-xl p-2 text-center border border-red-100"><div class="text-xl font-bold text-red-600">${r.alfa}</div><div class="text-[10px] text-red-800 font-bold">Alfa</div></div>
-        </div>
-
-        <h4 class="font-bold text-gray-800 mb-2 border-b pb-1">Setoran Terakhir</h4>
-        <table class="w-full text-left mb-6">
-          <thead><tr class="bg-gray-50 text-xs text-gray-500"><th class="p-2">Tanggal</th><th class="p-2">Jenis</th><th class="p-2">Detail</th><th class="p-2">Status</th></tr></thead>
-          <tbody>${setoranRows}</tbody>
-        </table>
-
-        ${!isSantri ? `
-        <div class="flex gap-2 no-print">
-          <button onclick="window.print()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">🖨 Print</button>
-          <button onclick="shareRaporWA()" class="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl">📤 Share WA</button>
-        </div>` : ''}
+      <div class="grid grid-cols-2 gap-2">
+        <select onchange="S.setoranData.status=this.value" class="border rounded p-2 text-sm font-bold"><option value="Lancar">Lancar</option><option value="Tidak Lancar">Tidak Lancar</option></select>
+        <input type="text" oninput="S.setoranData.catatan=this.value" value="${d.catatan}" placeholder="Catatan (Opsional)" class="border rounded p-2 text-sm">
       </div>
-    `;
-  }
-
-  return `
-    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 no-print">
-      <h2 class="text-xl font-bold mb-4">📝 Cetak Rapor</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-        <div class="sm:col-span-1"><label class="text-xs font-bold text-gray-600">Santri</label><select onchange="S.raporStudent=this.value" class="w-full bg-gray-50 border rounded-xl px-3 py-2 mt-1">${opts}</select></div>
-        <div><label class="text-xs font-bold text-gray-600">Bulan</label><select onchange="S.raporBulan=parseInt(this.value)" class="w-full bg-gray-50 border rounded-xl px-3 py-2 mt-1">${bulanOpts}</select></div>
-        <div><label class="text-xs font-bold text-gray-600">Tahun</label><input type="number" value="${S.raporTahun}" oninput="S.raporTahun=parseInt(this.value)" class="w-full bg-gray-50 border rounded-xl px-3 py-2 mt-1" /></div>
-      </div>
-      <button onclick="loadRapor()" ${S.loading?'disabled':''} class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl shadow-md">🔍 Tampilkan Rapor</button>
     </div>
-    ${html}
+
+    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mt-3">
+      <h3 class="font-bold text-sm text-gray-700 mb-2">Pilih Santri (${d.studentIds.length})</h3>
+      <div class="max-h-[30vh] overflow-y-auto grid grid-cols-2 gap-1">${pilihanSantri}</div>
+    </div>
+
+    <button onclick="submitSetoran(event)" class="w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg mt-3">💾 SIMPAN SETORAN</button>
   `;
 }
 
 function viewRekap() {
-  let bulanOpts = BULAN.map((b,i) => `<option value="${i+1}" ${S.rekapBulan==i+1?'selected':''}>${b}</option>`).join('');
-  
-  let rows = S.rekapData.map((r, i) => `
-    <tr class="border-b border-gray-100">
-      <td class="p-2 text-xs font-bold text-gray-400">${i+1}</td>
-      <td class="p-2 text-sm font-bold text-gray-800">${esc(r.name)}</td>
-      <td class="p-2 text-center text-green-600 font-bold">${r.hadir}</td>
-      <td class="p-2 text-center text-amber-600 font-bold">${r.sakit}</td>
-      <td class="p-2 text-center text-blue-600 font-bold">${r.izin}</td>
-      <td class="p-2 text-center text-red-600 font-bold">${r.alfa}</td>
-    </tr>
-  `).join('');
-
+  let bOpts = BULAN.map((b,i)=>`<option value="${i+1}" ${S.rekapBulan==i+1?'selected':''}>${b}</option>`).join('');
+  let content = '';
+  if(S.rekapTab==='kehadiran') {
+    content = `<table class="w-full text-left text-sm mt-3"><thead><tr class="bg-gray-50 text-xs text-gray-500"><th class="p-2">Nama</th><th class="p-2 text-center text-green-600">H</th><th class="p-2 text-center text-amber-600">S</th><th class="p-2 text-center text-blue-600">I</th><th class="p-2 text-center text-red-600">A</th></tr></thead><tbody>
+      ${S.rekapData.map(r=>`<tr class="border-b"><td class="p-2 font-bold text-xs">${esc(r.name)}</td><td class="p-2 text-center font-bold">${r.hadir}</td><td class="p-2 text-center font-bold">${r.sakit}</td><td class="p-2 text-center font-bold">${r.izin}</td><td class="p-2 text-center font-bold">${r.alfa}</td></tr>`).join('') || '<tr><td colspan="5" class="text-center p-3 text-gray-400">Kosong</td></tr>'}
+    </tbody></table>`;
+  } else {
+    const groups = {};
+    S.rekapSetoranData.forEach(r=>{
+      const key = `${r.tipe} - ${r.subTipe} - ${r.detail}`;
+      if(!groups[key]) groups[key] = [];
+      groups[key].push(r.studentName);
+    });
+    content = `<div class="mt-3 space-y-2">
+      ${Object.keys(groups).map(k=>`<div class="bg-gray-50 p-2 rounded-lg border"><div class="font-bold text-sm text-blue-700 mb-1">${esc(k)}</div><div class="flex flex-wrap gap-1">${groups[k].map(n=>`<span class="bg-white px-2 py-1 rounded shadow-sm text-xs font-bold text-gray-700">${esc(n)}</span>`).join('')}</div></div>`).join('') || '<div class="text-center text-gray-400">Belum ada data</div>'}
+    </div>`;
+  }
   return `
-    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-      <h2 class="text-xl font-bold mb-4">📊 Rekap Kehadiran</h2>
-      <div class="flex gap-2 mb-4">
-        <select onchange="S.rekapBulan=parseInt(this.value)" class="flex-1 bg-gray-50 border rounded-xl px-3 py-2 font-bold">${bulanOpts}</select>
-        <input type="number" value="${S.rekapTahun}" oninput="S.rekapTahun=parseInt(this.value)" class="w-24 bg-gray-50 border rounded-xl px-3 py-2 font-bold" />
-        <button onclick="loadRekap()" class="bg-blue-500 text-white px-4 rounded-xl font-bold">Cari</button>
-      </div>
-      
-      <div class="overflow-x-auto">
-        <table class="w-full text-left">
-          <thead><tr class="bg-gray-50 text-xs text-gray-500"><th class="p-2">#</th><th class="p-2">Nama</th><th class="p-2 text-center">H</th><th class="p-2 text-center">S</th><th class="p-2 text-center">I</th><th class="p-2 text-center">A</th></tr></thead>
-          <tbody>${rows || '<tr><td colspan="6" class="text-center p-4 text-gray-400">Belum ada data</td></tr>'}</tbody>
-        </table>
-      </div>
+    <div class="flex gap-2 mb-2 bg-white p-1 rounded-xl shadow-sm">
+      <button onclick="S.rekapTab='kehadiran';render()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapTab==='kehadiran'?'bg-amber-100 text-amber-700':'text-gray-500'}">Kehadiran</button>
+      <button onclick="S.rekapTab='setoran';render()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapTab==='setoran'?'bg-amber-100 text-amber-700':'text-gray-500'}">Sesi Baca (Setoran)</button>
+    </div>
+    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+      ${S.rekapTab==='kehadiran'?`
+        <div class="flex gap-2 mb-2"><select onchange="S.rekapBulan=parseInt(this.value)" class="flex-1 border rounded p-2 text-sm font-bold">${bOpts}</select><input type="number" oninput="S.rekapTahun=parseInt(this.value)" value="${S.rekapTahun}" class="w-20 border rounded p-2 text-sm font-bold"><button onclick="loadRekap()" class="bg-blue-500 text-white px-3 rounded text-sm font-bold">Cari</button></div>
+      `:`
+        <div class="flex gap-2 mb-2"><input type="date" value="${S.rekapTanggal}" onchange="S.rekapTanggal=this.value" class="flex-1 border rounded p-2 text-sm font-bold"><button onclick="loadRekapSetoran()" class="bg-blue-500 text-white px-3 rounded text-sm font-bold">Cari</button></div>
+      `}
+      ${content}
     </div>
   `;
 }
 
-function viewKlasemen() {
-  const sorted = S.students.slice().sort((a,b) => b.points - a.points);
-  let rows = sorted.map((s, i) => `
-    <div class="flex items-center gap-3 p-3 rounded-xl ${i===0?'bg-yellow-50 border border-yellow-200':'bg-white border border-gray-100'} mb-2">
-      <div class="text-xl font-black w-8 text-center ${i===0?'text-yellow-500':i===1?'text-gray-400':i===2?'text-orange-400':'text-gray-300'}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
-      <div class="flex-1">
-        <div class="font-bold text-gray-800">${esc(s.name)}</div>
-        <div class="text-xs text-gray-500">${esc(s.kelas)}</div>
-      </div>
-      <div class="text-xl font-black text-blue-600">${s.points}</div>
-    </div>
-  `).join('');
-
+function viewKlasemen(fS) {
+  const sorted = fS.slice().sort((a,b)=>b.points-a.points);
   return `
-    <div class="bg-gradient-to-r from-yellow-400 to-orange-400 p-4 rounded-2xl text-white shadow-md mb-4">
-      <h2 class="text-xl font-bold">🏆 Papan Peringkat</h2>
-      <p class="text-sm opacity-90">Siapa yang paling rajin hari ini?</p>
+    <div class="mb-3 flex justify-between items-center no-print">
+      <h2 class="font-bold text-lg text-gray-800">🏆 Klasemen Lengkap</h2>
+      <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold shadow">🖨 Cetak</button>
     </div>
-    <div class="max-h-[70vh] overflow-y-auto pr-1">${rows}</div>
-  `;
-}
-
-function viewRiwayat() {
-  let rows = S.riwayatData.map(r => {
-    const sign = r.points > 0 ? '+' : '';
-    const cls = r.points > 0 ? 'text-green-600' : 'text-red-600';
-    return `
-      <div class="border-b border-gray-100 p-3 flex justify-between items-center">
-        <div>
-          <div class="font-bold text-gray-800 text-sm">${esc(r.studentName)}</div>
-          <div class="text-xs text-gray-500">${esc(r.activity)}</div>
-          <div class="text-[10px] text-gray-400">${new Date(r.waktu).toLocaleString('id-ID')}</div>
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <h1 class="hidden print:block text-center font-black text-xl mb-4">KLASEMEN TPQ BANI SALEH</h1>
+      ${sorted.map((s,i)=>`
+        <div class="flex items-center gap-3 p-2 border-b">
+          <div class="font-black text-lg w-8 text-center ${i===0?'text-yellow-500':i===1?'text-gray-400':i===2?'text-orange-400':'text-gray-300'}">${i+1}</div>
+          <div class="flex-1 font-bold text-sm text-gray-800">${esc(s.name)} <span class="text-xs text-gray-500 font-normal">(${esc(s.kelas)})</span></div>
+          <div class="font-black text-blue-600">${s.points}</div>
         </div>
-        <div class="font-black text-lg ${cls}">${sign}${r.points}</div>
-      </div>
-    `;
-  }).join('');
-
-  return `
-    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-      <h2 class="text-xl font-bold mb-4">📋 Riwayat Poin</h2>
-      <div class="max-h-[70vh] overflow-y-auto">${rows || 'Belum ada riwayat'}</div>
+      `).join('')}
     </div>
   `;
 }
+
+function viewRapor() {
+  let opts = `<option value="">-- Pilih --</option>` + S.students.map(s=>`<option value="${s.id}" ${S.raporStudent==s.id?'selected':''}>${esc(s.name)}</option>`).join('');
+  let bOpts = BULAN.map((b,i)=>`<option value="${i+1}" ${S.raporBulan==i+1?'selected':''}>${b}</option>`).join('');
+  let h = '';
+  if(S.raporData) {
+    const r = S.raporData;
+    h = `<div class="mt-4 p-4 border-2 border-amber-200 rounded-xl bg-white">
+      <div class="text-center border-b pb-2 mb-3"><h2 class="font-black text-lg text-amber-600">RAPOR SANTRI</h2><p class="text-xs text-gray-500">${BULAN[r.periode.bulan-1]} ${r.periode.tahun}</p></div>
+      <div class="text-sm font-bold mb-3">Nama: ${esc(r.student.name)} <br>Kelas: ${esc(r.student.kelas)} <br>Rank: #${r.rank} dari ${r.totalSantri}</div>
+      <div class="grid grid-cols-4 gap-1 text-center mb-3">
+        <div class="bg-green-50 rounded p-1"><div class="font-bold text-green-700">${r.hadir}</div><div class="text-[10px]">Hadir</div></div>
+        <div class="bg-amber-50 rounded p-1"><div class="font-bold text-amber-700">${r.sakit}</div><div class="text-[10px]">Sakit</div></div>
+        <div class="bg-blue-50 rounded p-1"><div class="font-bold text-blue-700">${r.izin}</div><div class="text-[10px]">Izin</div></div>
+        <div class="bg-red-50 rounded p-1"><div class="font-bold text-red-700">${r.alfa}</div><div class="text-[10px]">Alfa</div></div>
+      </div>
+      <div class="font-bold text-sm mb-1 border-b">Setoran Terakhir:</div>
+      <ul class="text-xs space-y-1 mb-4">${r.setoranTerakhir.map(s=>`<li>• ${s.tipe} (${s.subTipe}): ${s.detail} - ${s.status}</li>`).join('') || '<li>Belum ada</li>'}</ul>
+      <div class="flex gap-2"><button onclick="window.print()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-2 rounded-lg text-sm">Print</button><button onclick="shareWA()" class="flex-1 bg-green-500 text-white font-bold py-2 rounded-lg text-sm">Share WA</button></div>
+    </div>`;
+  }
+  return `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3"><h2 class="font-bold mb-2">📝 Rapor</h2><div class="flex gap-2 mb-2"><select onchange="S.raporStudent=this.value" class="flex-1 border p-2 text-sm rounded">${opts}</select><select onchange="S.raporBulan=parseInt(this.value)" class="w-20 border p-2 text-sm rounded">${bOpts}</select></div><button onclick="loadRapor()" class="w-full bg-blue-500 text-white font-bold py-2 rounded">Tampilkan</button></div>${h}`;
+}
+async function shareWA() { try { const r = await api('generateRaporText', S.raporStudent, S.raporBulan, S.raporTahun); window.open('https://wa.me/?text='+encodeURIComponent(r.text), '_blank'); } catch(e){ showToast(e.message,'error'); } }
 
 function viewSantri() {
-  let rows = S.students.map(s => `
-    <div class="flex items-center justify-between p-3 border-b border-gray-100">
-      <div>
-        <div class="font-bold text-gray-800 text-sm">${esc(s.name)}</div>
-        <div class="text-xs text-gray-500">${esc(s.kelas)} · PIN: ${esc(s.pin)}</div>
-      </div>
-      <div class="flex gap-1">
-        <button onclick="S.editingSantri={id:${s.id},name:'${esc(s.name)}',kelas:'${esc(s.kelas)}',pin:'${esc(s.pin)}'};render();" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-bold">Edit</button>
-        <button onclick="if(confirm('Hapus ${esc(s.name)}?'))api('deleteSantri',${s.id}).then(loadData).then(render)" class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold">Hapus</button>
-      </div>
-    </div>
-  `).join('');
-
-  let modal = '';
-  if (S.editingSantri) {
-    modal = `
-      <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <form onsubmit="submitAddSantri(event)" class="bg-white p-5 rounded-2xl w-full max-w-sm fade-in">
-          <h3 class="font-bold text-lg mb-3">${S.editingSantri.id?'Edit':'Tambah'} Santri</h3>
-          <input type="text" required value="${esc(S.editingSantri.name)}" oninput="S.editingSantri.name=this.value" placeholder="Nama" class="w-full border-2 rounded-xl px-3 py-2 mb-2" />
-          <input type="text" value="${esc(S.editingSantri.kelas)}" oninput="S.editingSantri.kelas=this.value" placeholder="Kelas" class="w-full border-2 rounded-xl px-3 py-2 mb-2" />
-          <input type="text" value="${esc(S.editingSantri.pin)}" oninput="S.editingSantri.pin=this.value" placeholder="PIN (kosongkan untuk auto)" class="w-full border-2 rounded-xl px-3 py-2 mb-3" />
-          <div class="flex gap-2">
-            <button type="button" onclick="S.editingSantri=null;render();" class="flex-1 bg-gray-200 font-bold py-2 rounded-xl">Batal</button>
-            <button type="submit" class="flex-1 bg-blue-500 text-white font-bold py-2 rounded-xl">Simpan</button>
-          </div>
-        </form>
-      </div>
-    `;
-  }
-
-  return `
-    ${modal}
-    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">👥 Data Santri</h2>
-        <button onclick="S.editingSantri={name:'',kelas:'',pin:''};render();" class="bg-amber-400 text-white px-3 py-2 rounded-xl text-sm font-bold shadow-sm">+ Tambah</button>
-      </div>
-      <div class="max-h-[70vh] overflow-y-auto">${rows}</div>
-    </div>
-  `;
+  let list = S.students.map(s=>`<div class="flex justify-between items-center p-2 border-b"><div><div class="font-bold text-sm text-gray-800">${esc(s.name)}</div><div class="text-xs text-gray-500">${esc(s.kelas)} | PIN: ${esc(s.pin)}</div></div><div class="flex gap-1"><button onclick="S.editingSantri={id:${s.id},name:'${esc(s.name)}',kelas:'${esc(s.kelas)}',pin:'${esc(s.pin)}'};render()" class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded">Edit</button><button onclick="if(confirm('Hapus?'))api('deleteSantri',${s.id}).then(()=>loadData()).then(render)" class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded">X</button></div></div>`).join('');
+  let modal = S.editingSantri ? `<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"><form onsubmit="event.preventDefault();saveSantri()" class="bg-white p-4 rounded-xl w-full max-w-sm"><input type="text" required value="${esc(S.editingSantri.name)}" oninput="S.editingSantri.name=this.value" placeholder="Nama" class="w-full border rounded p-2 mb-2 text-sm"><input type="text" value="${esc(S.editingSantri.kelas)}" oninput="S.editingSantri.kelas=this.value" placeholder="Kelas (cth: Al-Quran)" class="w-full border rounded p-2 mb-2 text-sm"><input type="text" value="${esc(S.editingSantri.pin)}" oninput="S.editingSantri.pin=this.value" placeholder="PIN" class="w-full border rounded p-2 mb-3 text-sm"><div class="flex gap-2"><button type="button" onclick="S.editingSantri=null;render()" class="flex-1 bg-gray-200 font-bold py-2 rounded text-sm">Batal</button><button type="submit" class="flex-1 bg-blue-500 text-white font-bold py-2 rounded text-sm">Simpan</button></div></form></div>` : '';
+  return `${modal}<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100"><div class="flex justify-between mb-2"><h2 class="font-bold">Data Santri</h2><button onclick="S.editingSantri={name:'',kelas:'',pin:''};render()" class="bg-amber-400 text-white px-2 py-1 rounded text-xs font-bold">+ Tambah</button></div><div class="max-h-[70vh] overflow-y-auto">${list}</div></div>`;
 }
+async function saveSantri() { const p = S.editingSantri; try { if(p.id) await api('updateSantri', p.id, p); else await api('addSantri', p); S.editingSantri=null; await loadData(); showToast('Tersimpan','success'); } catch(e){ showToast(e.message,'error'); } render(); }
 
 function viewPengaturan() {
-  let rules = S.rules.map(r => `
-    <div class="flex items-center justify-between p-2 border-b border-gray-100">
-      <div class="font-bold text-sm text-gray-700">${esc(r.name)}</div>
-      <div class="flex items-center gap-2">
-        <span class="font-black ${r.points>0?'text-green-600':'text-red-600'}">${r.points>0?'+':''}${r.points}</span>
-        <button onclick="if(confirm('Hapus?'))api('deleteAturan',${r.id}).then(loadData).then(render)" class="text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">X</button>
-      </div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="space-y-4">
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <h2 class="text-xl font-bold mb-4">⚙️ Atur Poin Aktivitas</h2>
-        <form onsubmit="submitAddAturan(event)" class="flex gap-2 mb-4">
-          <input type="text" required value="${esc(S.newAturan.name)}" oninput="S.newAturan.name=this.value" placeholder="Nama aktivitas" class="flex-1 border-2 rounded-xl px-3 py-2 text-sm" />
-          <input type="number" required value="${S.newAturan.points}" oninput="S.newAturan.points=this.value" placeholder="Poin" class="w-20 border-2 rounded-xl px-3 py-2 text-sm" />
-          <button type="submit" class="bg-blue-500 text-white px-3 rounded-xl font-bold text-sm">+</button>
-        </form>
-        <div class="max-h-[50vh] overflow-y-auto">${rules}</div>
-      </div>
-      
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <h3 class="font-bold text-gray-800 mb-2">Info Sistem</h3>
-        <p class="text-xs text-gray-500">Sistem menggunakan Poin Otomatis: <b>Hadir = +2 Poin</b>.</p>
-        <p class="text-xs text-gray-500 mt-1">Jika santri lupa PIN, buka Google Sheets -> tab SANTRI -> kolom PIN.</p>
-      </div>
-    </div>
-  `;
+  let rules = S.rules.map(r=>`<div class="flex justify-between items-center p-2 border-b"><div class="text-xs font-bold text-gray-700">${esc(r.name)}</div><div class="flex items-center gap-2"><span class="text-xs font-black ${r.points>0?'text-green-600':'text-red-600'}">${r.points>0?'+':''}${r.points}</span><button onclick="if(confirm('Hapus?'))api('deleteAturan',${r.id}).then(()=>loadData()).then(render)" class="text-red-500 text-xs font-bold bg-red-50 px-2 rounded">X</button></div></div>`).join('');
+  return `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3"><h2 class="font-bold mb-2 text-sm">Atur Poin Aktivitas</h2><form onsubmit="event.preventDefault();saveAturan()" class="flex gap-1 mb-2"><input type="text" required oninput="S.newAturan.name=this.value" placeholder="Nama" class="flex-1 border rounded p-1 text-xs"><input type="number" required oninput="S.newAturan.points=this.value" placeholder="Poin" class="w-16 border rounded p-1 text-xs"><button type="submit" class="bg-blue-500 text-white px-2 rounded text-xs font-bold">+</button></form><div class="max-h-[50vh] overflow-y-auto">${rules}</div></div>`;
 }
+async function saveAturan() { try { await api('addAturan', S.newAturan); S.newAturan={name:'',points:1}; await loadData(); showToast('Tersimpan','success'); } catch(e){ showToast(e.message,'error'); } render(); }
 
-// =================================================================
 // BOOT
-// =================================================================
-(async function boot() {
-  const savedUser = sessionStorage.getItem('tpq_user');
-  if (savedUser && token()) { try { S.user = JSON.parse(savedUser); } catch(e){} }
-  await loadData();
-  S.loading = false;
-  if (S.user && S.view === 'dashboard') await loadDashboard();
-  render();
-})();
+(async()=>{ const u = sessionStorage.getItem('tpq_user'); if(u && token()) try{ S.user=JSON.parse(u); }catch(e){} await loadData(); S.loading=false; if(S.user) await loadDashboard(); render(); })();
 </script>
 </body>
 </html>
