@@ -43,8 +43,23 @@
   .dark .status-alfa.active { background: #ef4444; color: white; }
 
   @media print { 
-    .no-print { display: none !important; } 
-    body, .card { background: white !important; color: black !important; border: none !important; box-shadow: none !important; }
+    @page { margin: 12mm; }
+    .no-print { display: none !important; }
+    html, body { background: #fff !important; }
+    html, body, body * { 
+      color: #000 !important; 
+      background-color: #fff !important; 
+      box-shadow: none !important; 
+      text-shadow: none !important; 
+    }
+    .rounded-xl, .rounded-2xl, .rounded-3xl, .rounded-lg, .rounded { border-radius: 0 !important; }
+    .border, .border-2, .border-b, .border-t { border-color: #bbb !important; }
+    .print-klasemen { border: none !important; padding: 0 !important; }
+    .print-klasemen > div { page-break-inside: avoid; break-inside: avoid; }
+    .print-klasemen .font-black, .print-klasemen .font-bold { color: #000 !important; }
+    .print-rapor { border: 1.5px solid #333 !important; padding: 12px !important; page-break-inside: avoid; break-inside: avoid; }
+    .print-rapor h2 { color: #000 !important; }
+    .print-rapor .grid > div { border: 1px solid #999 !important; }
   }
 </style>
 </head>
@@ -169,7 +184,7 @@ function getFilteredStudents() {
     const matchKelas = !S.filterKelas || s.kelas === S.filterKelas;
     const matchSearch = !S.searchTerm || s.name.toLowerCase().includes(S.searchTerm.toLowerCase());
     return matchKelas && matchSearch;
-  });
+  }).sort((a,b)=>(a.name||'').localeCompare(b.name||'','id',{sensitivity:'base'}));
 }
 
 let searchFocusState = null;
@@ -263,14 +278,29 @@ function renderLogin() {
 function viewDashboard(fS) {
   if(!S.dashboard) return 'Memuat...';
   const d = S.dashboard;
+  const bd = d.breakdown || [];
+  const iqra = bd.find(b => /iqra/i.test(b.kelas));
+  const quran = bd.find(b => /qur/i.test(b.kelas));
+  const targets = (iqra || quran) ? [iqra, quran].filter(Boolean) : bd;
+  const colorMap = { iqra: { border: 'border-emerald-400', text: 'text-emerald-600 dark:text-emerald-400' }, quran: { border: 'border-purple-400', text: 'text-purple-600 dark:text-purple-400' } };
   return `
     <div class="grid grid-cols-2 gap-2 mb-3">
       <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border-l-4 border-blue-400"><div class="text-2xl font-black text-blue-600 dark:text-blue-400">${d.totalSantri}</div><div class="text-xs font-bold text-gray-500 dark:text-gray-400">Total Santri</div></div>
       <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border-l-4 border-green-400"><div class="text-2xl font-black text-green-600 dark:text-green-400">${d.totalHadir}</div><div class="text-xs font-bold text-gray-500 dark:text-gray-400">Hadir Hari Ini</div></div>
     </div>
+    ${targets.length ? `<div class="grid ${targets.length===1?'grid-cols-1':'grid-cols-2'} gap-2 mb-3">
+      ${targets.map(b => {
+        const isIqra = /iqra/i.test(b.kelas);
+        const c = isIqra ? colorMap.iqra : colorMap.quran;
+        return `<button onclick="S.filterKelas=this.dataset.k;goto('absensi')" data-k="${esc(b.kelas)}" class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border-l-4 ${c.border} text-left active:scale-95 transition">
+          <div class="text-xl font-black ${c.text}">${b.hadir}<span class="text-sm text-gray-400">/${b.total}</span></div>
+          <div class="text-xs font-bold text-gray-500 dark:text-gray-400">Hadir ${esc(b.kelas)}</div>
+        </button>`;
+      }).join('')}
+    </div>` : ''}
     <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-3">
       <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 mb-2">Belum Absen:</h3>
-      <div class="flex flex-wrap gap-1">${d.belumHadir.map(s=>`<span class="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs font-bold">${esc(s.name)}</span>`).join('') || '<span class="text-green-600 dark:text-green-400 text-xs font-bold">Semua Hadir!</span>'}</div>
+      <div class="flex flex-wrap gap-1">${(d.belumHadir || []).map(s=>`<span class="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs font-bold">${esc(s.name)}</span>`).join('') || '<span class="text-green-600 dark:text-green-400 text-xs font-bold">Semua Hadir!</span>'}</div>
     </div>
   `;
 }
@@ -439,7 +469,7 @@ function viewKlasemen(fS) {
       <h2 class="font-bold text-lg text-gray-800 dark:text-white">🏆 Klasemen Lengkap</h2>
       <button onclick="window.print()" class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow">🖨 Cetak</button>
     </div>
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+    <div class="print-klasemen bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
       <h1 class="hidden print:block text-center font-black text-xl mb-4 text-black">KLASEMEN TPQ BANI SALEH</h1>
       ${sorted.map((s,i)=>`
         <div class="flex items-center gap-3 p-2 border-b dark:border-gray-700">
@@ -458,7 +488,7 @@ function viewRapor() {
   let h = '';
   if(S.raporData) {
     const r = S.raporData;
-    h = `<div class="mt-4 p-4 border-2 border-amber-200 dark:border-amber-700 rounded-xl bg-white dark:bg-gray-800">
+    h = `<div class="print-rapor mt-4 p-4 border-2 border-amber-200 dark:border-amber-700 rounded-xl bg-white dark:bg-gray-800">
       <div class="text-center border-b dark:border-gray-600 pb-2 mb-3"><h2 class="font-black text-lg text-amber-600">RAPOR SANTRI</h2><p class="text-xs text-gray-500">${BULAN[r.periode.bulan-1]} ${r.periode.tahun}</p></div>
       <div class="text-sm font-bold mb-3">Nama: ${esc(r.student.name)} <br>Kelas: ${esc(r.student.kelas)} <br>Rank: #${r.rank} dari ${r.totalSantri}</div>
       <div class="grid grid-cols-4 gap-1 text-center mb-3">
