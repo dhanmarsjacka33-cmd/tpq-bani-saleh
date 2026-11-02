@@ -97,14 +97,21 @@ const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus
 
 const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const showToast = (msg, type='info') => { const c={success:'bg-green-500',error:'bg-red-500',info:'bg-blue-500',warn:'bg-amber-500'}; const e=document.createElement('div'); e.className=`fixed bottom-4 right-4 z-50 px-4 py-2 rounded-xl text-white font-bold shadow-lg ${c[type]} fade-in`; e.innerHTML=msg; document.body.appendChild(e); setTimeout(()=>e.remove(),3000); };
-const token = () => sessionStorage.getItem('tpq_token')||'';
-const setToken = t => t?sessionStorage.setItem('tpq_token',t):sessionStorage.removeItem('tpq_token');
-const saveUser = u => u?sessionStorage.setItem('tpq_user',JSON.stringify(u)):sessionStorage.removeItem('tpq_user');
+const token = () => localStorage.getItem('tpq_token')||'';
+const setToken = t => t?localStorage.setItem('tpq_token',t):localStorage.removeItem('tpq_token');
+const saveUser = u => u?localStorage.setItem('tpq_user',JSON.stringify(u)):localStorage.removeItem('tpq_user');
 
 async function api(fn, ...args) {
   try {
     const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({fn, args:[token()].concat(args)}) });
-    const j = await res.json(); if(!j.ok) throw new Error(j.error); return j.data;
+    const j = await res.json(); 
+    if(!j.ok) {
+      if (j.error && /sesi/i.test(j.error)) {
+        setToken(''); saveUser(null); S.user = null; S.loading = false; render();
+      }
+      throw new Error(j.error);
+    }
+    return j.data;
   } catch(e) { throw new Error(e.message); }
 }
 async function apiLogin(fn, ...args) {
@@ -115,7 +122,15 @@ async function apiLogin(fn, ...args) {
 }
 
 async function loadData() { try { const d = await api('getInitialData'); S.students=d.students||[]; S.rules=d.pointRules||[]; } catch(e){ S.error=e.message; } }
-async function loadDashboard() { try { S.dashboard = await api('getDashboardData'); } catch(e){} }
+const dashCache = { data: null, ts: 0 };
+const DASH_TTL = 60000;
+async function loadDashboard() {
+  if (dashCache.data && Date.now() - dashCache.ts < DASH_TTL) { S.dashboard = dashCache.data; return; }
+  try {
+    const d = await api('getDashboardData');
+    S.dashboard = d; dashCache.data = d; dashCache.ts = Date.now();
+  } catch(e){}
+}
 async function loadAbsensi() { try { const r = await api('getAttendanceByDate', S.absenTanggal); S.absenData={}; S.students.forEach(s=>S.absenData[s.id]={status:'Hadir',keterangan:''}); r.forEach(x=>S.absenData[x.studentId]={status:x.status,keterangan:x.keterangan}); } catch(e){} }
 async function loadRekap() { S.loading=true; render(); try { S.rekapData = await api('getRekapKehadiran', S.rekapBulan, S.rekapTahun, S.filterKelas); } catch(e){} S.loading=false; render(); }
 async function loadRekapSetoran() { S.loading=true; render(); try { S.rekapSetoranData = await api('getRekapSetoran', null); } catch(e){} S.loading=false; render(); }
@@ -125,16 +140,16 @@ async function doLogin() {
   S.loginError=''; S.isLoggingIn=true; render();
   try {
     const res = S.loginView==='admin' ? await apiLogin('loginAdmin', S.loginUser, S.loginPass) : await apiLogin('loginSantri', S.loginStudent, S.loginPass);
-    sessionStorage.clear(); setToken(res.token); S.user={role:res.role,data:res.data}; saveUser(S.user); S.view='dashboard'; await loadData();
+    setToken(res.token); S.user={role:res.role,data:res.data}; saveUser(S.user); S.view='dashboard'; await loadData();
   } catch(e) { S.loginError=e.message; }
   S.isLoggingIn=false; render();
 }
-async function doLogout() { try { await api('logoutUser'); } catch(e){} sessionStorage.clear(); S.user=null; render(); }
+async function doLogout() { try { await api('logoutUser'); } catch(e){} setToken(''); saveUser(null); S.user=null; render(); }
 async function submitAbsen() {
   S.submitting=true; render();
   try {
     const recs = Object.keys(S.absenData).map(id=>({studentId:parseInt(id), status:S.absenData[id].status, keterangan:S.absenData[id].keterangan||''}));
-    await api('saveAttendance', {tanggal:S.absenTanggal, records:recs}); showToast('✅ Tersimpan','success'); await loadData();
+    await api('saveAttendance', {tanggal:S.absenTanggal, records:recs}); dashCache.data=null; dashCache.ts=0; showToast('✅ Tersimpan','success'); await loadData();
   } catch(e){ showToast(e.message,'error'); } S.submitting=false; render();
 }
 async function submitPoin() {
@@ -149,7 +164,7 @@ async function submitPoin() {
       if(isNaN(parseInt(S.customAmount))) throw new Error('Poin tidak valid');
       await api('saveCustomPoints', S.selectedStudents, parseInt(S.customAmount), S.customNote);
     }
-    showToast('✅ Poin tersimpan','success'); S.selectedStudents=[]; S.selectedRules={}; S.customAmount=''; await loadData();
+    dashCache.data=null; dashCache.ts=0; showToast('✅ Poin tersimpan','success'); S.selectedStudents=[]; S.selectedRules={}; S.customAmount=''; await loadData();
   } catch(e){ showToast(e.message,'error'); } S.submitting=false; render();
 }
 async function submitSetoran(e) {
@@ -168,7 +183,7 @@ async function submitSetoran(e) {
       studentIds: S.setoranData.studentIds, tipe: S.setoranData.tipe, subTipe: S.setoranData.subTipe,
       detail: detail, status: S.setoranData.status, catatan: S.setoranData.catatan
     });
-    showToast(`✅ Setoran disimpan untuk ${S.setoranData.studentIds.length} santri`,'success');
+    dashCache.data=null; dashCache.ts=0; showToast(`✅ Setoran disimpan untuk ${S.setoranData.studentIds.length} santri`,'success');
     S.setoranData.studentIds=[]; render();
   } catch(e){ showToast(e.message,'error'); } S.submitting=false; render();
 }
@@ -254,7 +269,22 @@ function render() {
   }
 }
 const navBtn = (v, l) => `<button onclick="goto('${v}')" class="px-3 py-1.5 rounded-lg font-bold text-xs whitespace-nowrap ${S.view===v?'bg-amber-400 text-white shadow':'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300'}">${l}</button>`;
-async function goto(v) { S.view=v; if(v==='dashboard')await loadDashboard(); if(v==='absensi')await loadAbsensi(); if(v==='rekap')await loadRekap(); render(); }
+async function goto(v) { 
+  S.view = v; 
+  if (v === 'dashboard') {
+    if (dashCache.data) S.dashboard = dashCache.data;
+    render();
+    await loadDashboard();
+    render();
+  } else if (v === 'absensi') {
+    await loadAbsensi();
+    render();
+  } else if (v === 'rekap') {
+    await loadRekap();
+  } else {
+    render();
+  }
+}
 
 function renderLogin() {
   let c = '';
@@ -366,7 +396,7 @@ function viewSetoran(fS) {
 
   let pilihanSantri = fS.map(s=>{
     const isSel = d.studentIds.includes(s.id);
-    return `<div onclick="if(isSel)S.setoranData.studentIds=S.setoranData.studentIds.filter(i=>i!==${s.id});else S.setoranData.studentIds.push(${s.id});render()" class="flex justify-between p-2 rounded-lg border cursor-pointer ${isSel?'bg-green-50 dark:bg-green-900/30 border-green-300':'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}">
+    return `<div onclick="if(S.setoranData.studentIds.includes(${s.id}))S.setoranData.studentIds=S.setoranData.studentIds.filter(i=>i!==${s.id});else S.setoranData.studentIds.push(${s.id});render()" class="flex justify-between p-2 rounded-lg border cursor-pointer ${isSel?'bg-green-50 dark:bg-green-900/30 border-green-300':'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}">
       <div class="text-xs font-bold text-gray-700 dark:text-gray-300">${esc(s.name)}</div>
     </div>`;
   }).join('');
@@ -526,7 +556,7 @@ async function saveAturan() { try { await api('addAturan', S.newAturan); S.newAt
   S.darkMode = d === 'true'; 
   document.documentElement.classList.toggle('dark', S.darkMode);
   
-  const u = sessionStorage.getItem('tpq_user'); 
+  const u = localStorage.getItem('tpq_user'); 
   if(u && token()) try{ S.user=JSON.parse(u); }catch(e){} 
   
   // Render login screen atau loading screen langsung
