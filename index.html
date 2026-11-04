@@ -227,7 +227,7 @@ function toggleDarkMode() {
 
 function getFilteredStudents() {
   return S.students.filter(s => {
-    const matchKelas = !S.filterKelas || s.kelas === S.filterKelas;
+    const matchKelas = !S.filterKelas || (s.kelas||'').trim() === S.filterKelas.trim();
     const matchSearch = !S.searchTerm || s.name.toLowerCase().includes(S.searchTerm.toLowerCase());
     return matchKelas && matchSearch;
   }).sort((a,b)=>(a.name||'').localeCompare(b.name||'','id',{sensitivity:'base'}));
@@ -241,8 +241,13 @@ function handleSearchInput(el) {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => render(), 150);
 }
+let lastView = '';
 function render() {
   const app = document.getElementById('app');
+  const scrollY = window.scrollY;
+  const viewChanged = lastView !== S.view;
+  lastView = S.view;
+
   if(S.loading) return app.innerHTML = '<div class="min-h-screen flex items-center justify-center font-bold text-amber-500"><div class="text-center"><div class="text-5xl mb-4 animate-bounce">📖</div>Memuat...</div></div>';
   if(!S.user) return app.innerHTML = renderLogin();
   
@@ -264,7 +269,7 @@ function render() {
             <input type="text" id="searchInput" value="${esc(S.searchTerm)}" placeholder="Cari nama..." aria-label="Cari nama santri" oninput="handleSearchInput(this)" class="w-full sm:w-40 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg pl-8 pr-2 py-1.5 text-xs text-gray-800 dark:text-white focus:outline-none">
             <span class="absolute left-2 top-1.5 text-gray-400">🔍</span>
           </div>
-          <select aria-label="Filter Kelas" onchange="S.filterKelas=this.value;render()" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5 text-xs font-bold text-gray-800 dark:text-white">
+          <select aria-label="Filter Kelas" onchange="S.filterKelas=this.value; if(S.view==='rekap') loadRekap(); else render()" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5 text-xs font-bold text-gray-800 dark:text-white">
             <option value="">Semua Kelas</option>
             ${kList.map(k=>`<option value="${k}" ${S.filterKelas===k?'selected':''}>${k}</option>`).join('')}
           </select>
@@ -310,6 +315,10 @@ function render() {
       inp.setSelectionRange(searchFocusState.start, searchFocusState.end);
     }
     searchFocusState = null;
+  }
+  
+  if (!viewChanged) {
+    window.scrollTo(0, scrollY);
   }
 }
 const navBtn = (v, l) => `<button onclick="goto('${v}')" class="px-3 py-1.5 rounded-lg font-bold text-xs whitespace-nowrap ${S.view===v?'bg-amber-400 text-white shadow':'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300'}">${l}</button>`;
@@ -454,7 +463,11 @@ function viewAbsensi(fS) {
   return `
     <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-3 space-y-2">
       <input type="date" aria-label="Tanggal Absensi" value="${S.absenTanggal}" onchange="S.absenTanggal=this.value;loadAbsensi().then(render)" class="w-full border rounded px-3 py-2 font-bold text-sm dark:bg-gray-700 dark:border-gray-600">
-      <button onclick="if(confirm('Set semua santri menjadi HADIR?')){getFilteredStudents().forEach(s=>S.absenData[s.id].status='Hadir');render()}" class="w-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 text-xs font-bold py-2 rounded-lg">✅ Set Semua Hadir</button>
+      <div class="grid grid-cols-3 gap-1">
+        <button onclick="if(confirm('Set semua menjadi HADIR?')){getFilteredStudents().forEach(s=>S.absenData[s.id].status='Hadir');render()}" class="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 text-xs font-bold py-2 rounded-lg">✅ Semua</button>
+        <button onclick="if(confirm('Set semua Iqra menjadi HADIR?')){getFilteredStudents().filter(s=>/iqra/i.test(s.kelas)).forEach(s=>S.absenData[s.id].status='Hadir');render()}" class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold py-2 rounded-lg">✅ Iqra</button>
+        <button onclick="if(confirm('Set semua Al-Quran menjadi HADIR?')){getFilteredStudents().filter(s=>/qur/i.test(s.kelas)).forEach(s=>S.absenData[s.id].status='Hadir');render()}" class="bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-xs font-bold py-2 rounded-lg">✅ Quran</button>
+      </div>
     </div>
     <div class="sticky top-0 z-10 bg-amber-50 dark:bg-amber-900/30 border-2 border-amber-300 dark:border-amber-700 rounded-lg p-2 mb-2 text-center text-xs font-bold">
       <span class="text-green-700 dark:text-green-300">H:${hc}</span> · 
@@ -510,8 +523,10 @@ function viewSetoran(fS) {
 
   let pilihanSantri = fS.map(s=>{
     const isSel = d.studentIds.includes(s.id);
-    return `<div onclick="if(S.setoranData.studentIds.includes(${s.id}))S.setoranData.studentIds=S.setoranData.studentIds.filter(i=>i!==${s.id});else S.setoranData.studentIds.push(${s.id});render()" class="flex justify-between p-2 rounded-lg border cursor-pointer ${isSel?'bg-green-50 dark:bg-green-900/30 border-green-300':'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}">
+    const last = s.lastSetoran;
+    return `<div onclick="if(S.setoranData.studentIds.includes(${s.id}))S.setoranData.studentIds=S.setoranData.studentIds.filter(i=>i!==${s.id});else S.setoranData.studentIds.push(${s.id});render()" class="flex flex-col p-2 rounded-lg border cursor-pointer ${isSel?'bg-green-50 dark:bg-green-900/30 border-green-300':'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}">
       <div class="text-xs font-bold text-gray-700 dark:text-gray-300">${esc(s.name)}</div>
+      ${last ? `<div class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">${esc(last.subTipe)}: ${esc(last.detail)}</div>` : `<div class="text-[10px] text-gray-400 mt-0.5 italic">Belum ada setoran</div>`}
     </div>`;
   }).join('');
 
