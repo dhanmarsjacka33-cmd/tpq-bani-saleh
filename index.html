@@ -109,7 +109,7 @@ const S = {
   poinTab: 'aturan', selectedStudents: [], selectedRules: {}, customAmount: '', customNote: '',
   setoranData: { studentIds: [], tipe: 'Bacaan', subTipe: 'Iqra Hitam', jilid: '1', halaman: '', juz: '30', surah: '', ayatStart: '', ayatEnd: '', detailManual: '', status: 'Lancar', catatan: '' },
   rekapTab: 'kehadiran', rekapBulan: new Date().getMonth()+1, rekapTahun: new Date().getFullYear(), rekapData: [], rekapSetoranData: [], rekapTanggal: new Date().toISOString().slice(0,10),
-  raporStudent: '', raporBulan: new Date().getMonth()+1, raporTahun: new Date().getFullYear(), raporData: null,
+  raporStudent: '', raporStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10), raporEnd: new Date().toISOString().slice(0,10), raporData: null,
   editingSantri: null, newAturan: { name: '', points: 1 },
   submitting: false,
   moreSheetOpen: false
@@ -163,7 +163,7 @@ async function loadDashboard() {
 async function loadAbsensi() { try { const r = await api('getAttendanceByDate', S.absenTanggal); S.absenData={}; S.students.forEach(s=>S.absenData[s.id]={status:'Hadir',keterangan:''}); r.forEach(x=>S.absenData[x.studentId]={status:x.status,keterangan:x.keterangan}); } catch(e){} }
 async function loadRekap() { S.loading=true; render(); try { S.rekapData = await api('getRekapKehadiran', S.rekapBulan, S.rekapTahun, S.filterKelas); } catch(e){} S.loading=false; render(); }
 async function loadRekapSetoran() { S.loading=true; render(); try { S.rekapSetoranData = await api('getRekapSetoran', null); } catch(e){} S.loading=false; render(); }
-async function loadRapor() { if(!S.raporStudent) return showToast('Pilih santri','warn'); S.loading=true; render(); try { S.raporData = await api('getRaporSantri', S.raporStudent, S.raporBulan, S.raporTahun); } catch(e){} S.loading=false; render(); }
+async function loadRapor() { if(!S.raporStudent) return showToast('Pilih santri','warn'); S.loading=true; render(); try { S.raporData = await api('getRaporSantri', S.raporStudent, S.raporStart, S.raporEnd); } catch(e){} S.loading=false; render(); }
 
 async function doLogin() {
   S.loginError=''; S.isLoggingIn=true; render();
@@ -499,7 +499,7 @@ function viewAbsensi(fS) {
 }
 
 function viewPoin(fS) {
-  let rules = S.rules.map(r=>{
+  const renderRule = (r) => {
     const isSel = S.selectedRules[r.id] !== undefined;
     return `<div onclick="if(S.selectedRules[${r.id}] !== undefined) delete S.selectedRules[${r.id}]; else S.selectedRules[${r.id}]=1; render();" class="flex items-center justify-between p-2 rounded-lg border-2 cursor-pointer ${isSel?'bg-blue-50 dark:bg-blue-900/30 border-blue-400':'bg-gray-50 dark:bg-gray-700 border-transparent'}">
       <div class="text-xs font-bold text-gray-700 dark:text-gray-300">${esc(r.name)}</div>
@@ -508,7 +508,19 @@ function viewPoin(fS) {
         <div class="text-xs font-black ${r.points>0?'text-green-600 dark:text-green-400':'text-red-600 dark:text-red-400'}">${r.points>0?'+':''}${r.points}${r.isMultiplier?' ×':''}</div>
       </div>
     </div>`;
-  }).join('');
+  };
+  const posRules = S.rules.filter(r => r.points > 0).sort((a,b) => b.points - a.points).map(renderRule).join('');
+  const negRules = S.rules.filter(r => r.points < 0).sort((a,b) => a.points - b.points).map(renderRule).join('');
+  let rules = `
+    <div class="mb-2">
+      <div class="text-[10px] font-bold text-green-600 mb-1 uppercase tracking-wide">Penambahan (+)</div>
+      <div class="space-y-1">${posRules}</div>
+    </div>
+    <div>
+      <div class="text-[10px] font-bold text-red-600 mb-1 uppercase tracking-wide">Pengurangan (-)</div>
+      <div class="space-y-1">${negRules}</div>
+    </div>
+  `;
   let stus = fS.map(s=>{
     const isSel = S.selectedStudents.includes(s.id);
     return `<div onclick="if(S.selectedStudents.includes(${s.id})) S.selectedStudents=S.selectedStudents.filter(i=>i!==${s.id}); else S.selectedStudents.push(${s.id}); render();" class="flex justify-between p-2 rounded-lg border cursor-pointer ${isSel?'bg-blue-50 dark:bg-blue-900/30 border-blue-300':'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}">
@@ -651,9 +663,25 @@ function viewRekap() {
       if(!groups[key]) groups[key] = [];
       groups[key].push(r.studentName);
     });
-    content = Object.keys(groups).length ? `<div class="mt-3 space-y-2">
-      ${Object.keys(groups).map(k=>`<div class="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg border dark:border-gray-600"><div class="font-bold text-sm text-blue-700 dark:text-blue-400 mb-1">${esc(k)}</div><div class="flex flex-wrap gap-1">${groups[k].map(n=>`<span class="bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-sm text-xs font-bold text-gray-700 dark:text-gray-300">${esc(n)}</span>`).join('')}</div></div>`).join('')}
-    </div>` : `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada setoran</div><div class="text-xs text-gray-400 mt-1">Input setoran terlebih dahulu</div></div>`;
+    if (Object.keys(groups).length) {
+      const maxCount = Math.max(...Object.values(groups).map(g => g.length), 1);
+      content = `<div class="mt-3 space-y-3">
+        ${Object.keys(groups).map(k=>`
+          <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border dark:border-gray-600">
+            <div class="flex justify-between items-center mb-1">
+              <div class="font-bold text-sm text-blue-700 dark:text-blue-400">${esc(k)}</div>
+              <div class="text-xs font-black text-blue-600 dark:text-blue-300">${groups[k].length} Santri</div>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 mb-2">
+              <div class="bg-blue-500 h-2 rounded-full" style="width: ${(groups[k].length / maxCount) * 100}%"></div>
+            </div>
+            <div class="flex flex-wrap gap-1">${groups[k].map(n=>`<span class="bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-sm text-[10px] font-bold text-gray-700 dark:text-gray-300">${esc(n)}</span>`).join('')}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    } else {
+      content = `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada setoran</div><div class="text-xs text-gray-400 mt-1">Input setoran terlebih dahulu</div></div>`;
+    }
   }
   return `
     <div class="flex gap-2 mb-2 bg-white dark:bg-gray-800 p-1 rounded-xl shadow-sm">
@@ -693,12 +721,62 @@ function viewKlasemen(fS) {
 
 function viewRapor() {
   let opts = `<option value="">-- Pilih --</option>` + S.students.map(s=>`<option value="${s.id}" ${S.raporStudent==s.id?'selected':''}>${esc(s.name)}</option>`).join('');
-  let bOpts = BULAN.map((b,i)=>`<option value="${i+1}" ${S.raporBulan==i+1?'selected':''}>${b}</option>`).join('');
   let h = '';
   if(S.raporData) {
     const r = S.raporData;
+    
+    // Generate Kalender Kehadiran
+    let calendarHtml = '';
+    if (r.dailyAttendance) {
+      const start = new Date(S.raporStart);
+      const end = new Date(S.raporEnd);
+      let daysHtml = '';
+      let curr = new Date(start);
+      const firstDay = start.getDay(); 
+      for(let i=0; i<firstDay; i++) daysHtml += `<div></div>`;
+      while (curr <= end) {
+        const k = curr.toISOString().slice(0,10);
+        const st = r.dailyAttendance[k] || '';
+        let bg = 'bg-gray-100 dark:bg-gray-700 text-gray-400';
+        if (st === 'Hadir') bg = 'bg-green-500 text-white';
+        else if (st === 'Sakit') bg = 'bg-amber-500 text-white';
+        else if (st === 'Izin') bg = 'bg-blue-500 text-white';
+        else if (st === 'Alfa') bg = 'bg-red-500 text-white';
+        daysHtml += `<div class="text-center p-1 rounded ${bg} text-[10px] font-bold" title="${k}: ${st||'Belum absen'}">${curr.getDate()}</div>`;
+        curr.setDate(curr.getDate() + 1);
+      }
+      calendarHtml = `
+        <div class="font-bold text-sm mb-1 border-b dark:border-gray-600 pb-1 mt-3">Kalender Kehadiran:</div>
+        <div class="grid grid-cols-7 gap-1 mb-4 text-center text-[10px] font-bold text-gray-500">
+          <div>S</div><div>S</div><div>R</div><div>K</div><div>J</div><div>S</div><div>M</div>
+        </div>
+        <div class="grid grid-cols-7 gap-1 mb-4">${daysHtml}</div>
+      `;
+    }
+
+    // Generate Grafik Poin
+    let chartHtml = '';
+    if (r.chartData && r.chartData.length > 0) {
+      const maxP = Math.max(...r.chartData.map(d => d.points), 1);
+      chartHtml = `
+        <div class="font-bold text-sm mb-1 border-b dark:border-gray-600 pb-1 mt-3">Grafik Perkembangan Poin:</div>
+        <div class="flex items-end gap-1 h-24 bg-gray-50 dark:bg-gray-700 rounded p-2 overflow-x-auto mb-4">
+          ${r.chartData.map(d => `
+            <div class="flex flex-col items-center min-w-[30px]">
+              <div class="text-[9px] text-gray-500">${d.points}</div>
+              <div class="w-full bg-blue-500 rounded-t" style="height: ${(d.points/maxP)*60}%"></div>
+              <div class="text-[8px] text-gray-400 mt-1 whitespace-nowrap">${d.date.slice(5)}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
     h = `<div class="print-rapor mt-4 p-4 border-2 border-amber-200 dark:border-amber-700 rounded-xl bg-white dark:bg-gray-800">
-      <div class="text-center border-b dark:border-gray-600 pb-2 mb-3"><h2 class="font-black text-lg text-amber-600">RAPOR SANTRI</h2><p class="text-xs text-gray-500">${BULAN[r.periode.bulan-1]} ${r.periode.tahun}</p></div>
+      <div class="text-center border-b dark:border-gray-600 pb-2 mb-3">
+        <h2 class="font-black text-lg text-amber-600">RAPOR SANTRI</h2>
+        <p class="text-xs text-gray-500">${r.periode.start} s/d ${r.periode.end}</p>
+      </div>
       <div class="text-sm font-bold mb-3">Nama: ${esc(r.student.name)} <br>Kelas: ${esc(r.student.kelas)} <br>Rank: #${r.rank} dari ${r.totalSantri}</div>
       <div class="grid grid-cols-4 gap-1 text-center mb-3">
         <div class="bg-green-50 dark:bg-green-900/30 rounded p-1"><div class="font-bold text-green-700 dark:text-green-400">${r.hadir}</div><div class="text-[10px] text-gray-600 dark:text-gray-400">Hadir</div></div>
@@ -706,14 +784,24 @@ function viewRapor() {
         <div class="bg-blue-50 dark:bg-blue-900/30 rounded p-1"><div class="font-bold text-blue-700 dark:text-blue-400">${r.izin}</div><div class="text-[10px] text-gray-600 dark:text-gray-400">Izin</div></div>
         <div class="bg-red-50 dark:bg-red-900/30 rounded p-1"><div class="font-bold text-red-700 dark:text-red-400">${r.alfa}</div><div class="text-[10px] text-gray-600 dark:text-gray-400">Alfa</div></div>
       </div>
+      ${chartHtml}
+      ${calendarHtml}
       <div class="font-bold text-sm mb-1 border-b dark:border-gray-600 pb-1">Setoran Terakhir:</div>
       <ul class="text-xs space-y-1 mb-4">${r.setoranTerakhir.map(s=>`<li>• ${s.tipe} (${s.subTipe}): ${s.detail} - ${s.status}</li>`).join('') || '<li>Belum ada</li>'}</ul>
       <div class="flex gap-2 no-print"><button onclick="window.print()" class="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-white font-bold py-2 rounded-lg text-sm">Print</button><button onclick="shareWA()" class="flex-1 bg-green-500 text-white font-bold py-2 rounded-lg text-sm">Share WA</button></div>
     </div>`;
   }
-  return `<div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-3"><h2 class="font-bold mb-2">📝 Rapor</h2><div class="flex gap-2 mb-2"><select onchange="S.raporStudent=this.value;if(this.value)loadRapor()" class="flex-1 border p-2 text-sm rounded dark:bg-gray-700 dark:border-gray-600">${opts}</select><select onchange="S.raporBulan=parseInt(this.value);if(S.raporStudent)loadRapor()" class="w-24 border p-2 text-sm rounded dark:bg-gray-700 dark:border-gray-600">${bOpts}</select></div><button onclick="loadRapor()" class="w-full bg-blue-500 text-white font-bold py-2 rounded">Tampilkan</button></div>${h}`;
+  return `<div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-3"><h2 class="font-bold mb-2">📝 Rapor</h2>
+  <div class="space-y-2 mb-2">
+    <select onchange="S.raporStudent=this.value;if(this.value)loadRapor()" class="w-full border p-2 text-sm rounded dark:bg-gray-700 dark:border-gray-600">${opts}</select>
+    <div class="flex gap-2">
+      <input type="date" value="${S.raporStart}" onchange="S.raporStart=this.value;if(S.raporStudent)loadRapor()" class="flex-1 border p-2 text-sm rounded dark:bg-gray-700 dark:border-gray-600">
+      <input type="date" value="${S.raporEnd}" onchange="S.raporEnd=this.value;if(S.raporStudent)loadRapor()" class="flex-1 border p-2 text-sm rounded dark:bg-gray-700 dark:border-gray-600">
+    </div>
+  </div>
+  <button onclick="loadRapor()" class="w-full bg-blue-500 text-white font-bold py-2 rounded">Tampilkan</button></div>${h}`;
 }
-async function shareWA() { try { const r = await api('generateRaporText', S.raporStudent, S.raporBulan, S.raporTahun); window.open('https://wa.me/?text='+encodeURIComponent(r.text), '_blank'); } catch(e){ showToast(e.message,'error'); } }
+async function shareWA() { try { const r = await api('generateRaporText', S.raporStudent, S.raporStart, S.raporEnd); window.open('https://wa.me/?text='+encodeURIComponent(r.text), '_blank'); } catch(e){ showToast(e.message,'error'); } }
 
 function viewSantri() {
   const fS = getFilteredStudents();
