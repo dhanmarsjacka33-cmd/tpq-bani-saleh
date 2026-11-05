@@ -677,26 +677,52 @@ function viewRekap() {
   };
 
   if(S.rekapTab==='kehadiran') {
+    let tableView = '';
+    if (!S.rekapData.length) {
+      tableView = `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada data rekap untuk periode ini</div><div class="text-xs text-gray-400 mt-1">Coba ubah tanggal mulai atau akhir</div></div>`;
+    } else {
+      tableView = `
+        <div class="md:hidden space-y-1 mt-3">
+          ${S.rekapData.map(r=>`<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
+            <div class="font-bold text-xs text-gray-800 dark:text-gray-200 mb-1">${esc(r.name)}</div>
+            <div class="flex gap-1 text-[10px] font-bold">
+              <span class="badge-hadir px-2 py-0.5 rounded">H:${r.hadir}</span>
+              <span class="badge-sakit px-2 py-0.5 rounded">S:${r.sakit}</span>
+              <span class="badge-izin px-2 py-0.5 rounded">I:${r.izin}</span>
+              <span class="badge-alfa px-2 py-0.5 rounded">A:${r.alfa}</span>
+            </div>
+          </div>`).join('')}
+        </div>
+        <table class="hidden md:table w-full text-left text-sm mt-3">
+          <thead>
+            <tr class="bg-gray-50 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-300">
+              <th class="p-2">Nama</th>
+              <th class="p-2 text-center text-green-600">H</th>
+              <th class="p-2 text-center text-amber-600">S</th>
+              <th class="p-2 text-center text-blue-600">I</th>
+              <th class="p-2 text-center text-red-600">A</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${S.rekapData.map(r=>`<tr class="border-b dark:border-gray-700">
+              <td class="p-2 font-bold text-xs">${esc(r.name)}</td>
+              <td class="p-2 text-center font-bold">${r.hadir}</td>
+              <td class="p-2 text-center font-bold">${r.sakit}</td>
+              <td class="p-2 text-center font-bold">${r.izin}</td>
+              <td class="p-2 text-center font-bold">${r.alfa}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
     content = `
       <div class="flex gap-2 mb-2 mt-2">
         <button onclick="S.rekapView='tabel';render()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapView==='tabel'?'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}">Tabel</button>
         <button onclick="S.rekapView='kalender';loadCalendar()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapView==='kalender'?'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}">Kalender</button>
       </div>
-      ${S.rekapView === 'kalender' ? renderCalendarView() : (!S.rekapData.length ? `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada data rekap untuk periode ini</div><div class="text-xs text-gray-400 mt-1">Coba ubah tanggal mulai atau akhir</div></div>` : `
-      <div class="md:hidden space-y-1 mt-3">
-        ${S.rekapData.map(r=>`<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
-          <div class="font-bold text-xs text-gray-800 dark:text-gray-200 mb-1">${esc(r.name)}</div>
-          <div class="flex gap-1 text-[10px] font-bold">
-            <span class="badge-hadir px-2 py-0.5 rounded">H:${r.hadir}</span>
-            <span class="badge-sakit px-2 py-0.5 rounded">S:${r.sakit}</span>
-            <span class="badge-izin px-2 py-0.5 rounded">I:${r.izin}</span>
-            <span class="badge-alfa px-2 py-0.5 rounded">A:${r.alfa}</span>
-          </div>
-        </div>`).join('')}
-      </div>
-      <table class="hidden md:table w-full text-left text-sm mt-3"><thead><tr class="bg-gray-50 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-300"><th class="p-2">Nama</th><th class="p-2 text-center text-green-600">H</th><th class="p-2 text-center text-amber-600">S</th><th class="p-2 text-center text-blue-600">I</th><th class="p-2 text-center text-red-600">A</th></tr></thead><tbody>
-      ${S.rekapData.map(r=>`<tr class="border-b dark:border-gray-700"><td class="p-2 font-bold text-xs">${esc(r.name)}</td><td class="p-2 text-center font-bold">${r.hadir}</td><td class="p-2 text-center font-bold">${r.sakit}</td><td class="p-2 text-center font-bold">${r.izin}</td><td class="p-2 text-center font-bold">${r.alfa}</td></tr>`).join('')}
-    </tbody></table>`) }
+      ${S.rekapView === 'kalender' ? renderCalendarView() : tableView}
+    `;
   } else {
     const groups = {};
     S.rekapSetoranData.forEach(r=>{
