@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TPQ Bani Saleh - Aplikasi</title>
 <meta name="description" content="Aplikasi Manajemen TPQ Bani Saleh Cicadas">
-<!-- ⭐ FIX: Favicon Inline (Mencegah Error 404) -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +61,6 @@
     .print-rapor .grid > div { border: 1px solid #999 !important; }
   }
 
-  /* ⭐ UI/UX: Utility badge status */
   .badge-hadir { background: #d1fae5; color: #065f46; }
   .badge-sakit { background: #fef3c7; color: #92400e; }
   .badge-izin  { background: #dbeafe; color: #1e40af; }
@@ -72,19 +70,16 @@
   .dark .badge-izin  { background: #1e3a8a; color: #bfdbfe; }
   .dark .badge-alfa  { background: #7f1d1d; color: #fecaca; }
 
-  /* ⭐ UI/UX: Skeleton loading */
   @keyframes skel { 0%,100% { opacity: 0.5 } 50% { opacity: 0.9 } }
   .skeleton { animation: skel 1.2s ease-in-out infinite; background: #e5e7eb; border-radius: 12px; }
   .dark .skeleton { background: #334155; }
   .skeleton-card { height: 72px; }
 
-  /* ⭐ UI/UX: Toast animation */
   @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
   .toast-in { animation: fadeSlideIn 0.2s ease-out; }
 </style>
 </head>
 <body>
-<!-- ⭐ FIX NO_FCP: Loading screen dirender langsung dari HTML -->
 <div id="app">
   <div class="min-h-screen flex items-center justify-center bg-yellow-50 dark:bg-gray-900">
     <div class="text-center fade-in">
@@ -108,7 +103,7 @@ const S = {
   absenTanggal: new Date().toISOString().slice(0,10), absenData: {},
   poinTab: 'aturan', selectedStudents: [], selectedRules: {}, customAmount: '', customNote: '',
   setoranData: { studentIds: [], tipe: 'Bacaan', subTipe: 'Iqra Hitam', jilid: '1', halaman: '', juz: '30', surah: '', ayatStart: '', ayatEnd: '', detailManual: '', status: 'Lancar', catatan: '' },
-  rekapTab: 'kehadiran', rekapView: 'tabel', rekapBulan: new Date().getMonth()+1, rekapTahun: new Date().getFullYear(), rekapData: [], rekapCalendar: {}, rekapSetoranData: [], rekapTanggal: new Date().toISOString().slice(0,10),
+  rekapTab: 'kehadiran', rekapView: 'tabel', rekapStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10), rekapEnd: new Date().toISOString().slice(0,10), rekapData: [], rekapCalendar: {}, rekapSetoranData: [], rekapTanggal: new Date().toISOString().slice(0,10),
   raporStudent: '', raporStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10), raporEnd: new Date().toISOString().slice(0,10), raporData: null,
   editingSantri: null, newAturan: { name: '', points: 1 },
   submitting: false,
@@ -161,14 +156,14 @@ async function loadDashboard() {
   } catch(e){}
 }
 async function loadAbsensi() { try { const r = await api('getAttendanceByDate', S.absenTanggal); S.absenData={}; S.students.forEach(s=>S.absenData[s.id]={status:'Hadir',keterangan:''}); r.forEach(x=>S.absenData[x.studentId]={status:x.status,keterangan:x.keterangan}); } catch(e){} }
-async function loadRekap() { S.loading=true; render(); try { S.rekapData = await api('getRekapKehadiran', S.rekapBulan, S.rekapTahun, S.filterKelas); } catch(e){} S.loading=false; render(); }
+async function loadRekap() { S.loading=true; render(); try { S.rekapData = await api('getRekapKehadiran', S.rekapStart, S.rekapEnd, S.filterKelas); } catch(e){} S.loading=false; render(); }
 async function loadCalendar() { 
   if(S.rekapView !== 'kalender') return;
   S.loading=true; render(); 
-  try { S.rekapCalendar = await api('getCalendarData', S.rekapBulan, S.rekapTahun); } catch(e){} 
+  try { S.rekapCalendar = await api('getCalendarData', S.rekapStart, S.rekapEnd); } catch(e){} 
   S.loading=false; render(); 
 }
-async function loadRekapSetoran() { S.loading=true; render(); try { S.rekapSetoranData = await api('getRekapSetoran', null); } catch(e){} S.loading=false; render(); }
+async function loadRekapSetoran() { S.loading=true; render(); try { S.rekapSetoranData = await api('getRekapSetoran'); } catch(e){} S.loading=false; render(); }
 async function loadRapor() { if(!S.raporStudent) return showToast('Pilih santri','warn'); S.loading=true; render(); try { S.raporData = await api('getRaporSantri', S.raporStudent, S.raporStart, S.raporEnd); } catch(e){} S.loading=false; render(); }
 
 async function doLogin() {
@@ -254,6 +249,7 @@ function getHadirIds() {
   }
   return S.students.filter(s => S.absenData[s.id]?.status === 'Hadir').map(s => s.id);
 }
+
 let lastView = '';
 function render() {
   const app = document.getElementById('app');
@@ -644,12 +640,11 @@ function viewSetoran(fS) {
 }
 
 function viewRekap() {
-  let bOpts = BULAN.map((b,i)=>`<option value="${i+1}" ${S.rekapBulan==i+1?'selected':''}>${b}</option>`).join('');
   let content = '';
   const renderCalendarView = () => {
-    if(!S.rekapCalendar || Object.keys(S.rekapCalendar).length === 0) return '<div class="text-center py-4 text-gray-500">Belum ada data kehadiran bulan ini</div>';
-    const start = new Date(S.rekapTahun, S.rekapBulan-1, 1);
-    const end = new Date(S.rekapTahun, S.rekapBulan, 0);
+    if(!S.rekapCalendar || Object.keys(S.rekapCalendar).length === 0) return '<div class="text-center py-4 text-gray-500">Belum ada data kehadiran pada periode ini</div>';
+    const start = new Date(S.rekapStart);
+    const end = new Date(S.rekapEnd);
     let days = '';
     let curr = new Date(start);
     const firstDay = start.getDay();
@@ -687,7 +682,7 @@ function viewRekap() {
         <button onclick="S.rekapView='tabel';render()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapView==='tabel'?'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}">Tabel</button>
         <button onclick="S.rekapView='kalender';loadCalendar()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapView==='kalender'?'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}">Kalender</button>
       </div>
-      ${S.rekapView === 'kalender' ? renderCalendarView() : (!S.rekapData.length ? `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada data rekap untuk periode ini</div><div class="text-xs text-gray-400 mt-1">Coba ubah bulan atau tahun</div></div>` : `
+      ${S.rekapView === 'kalender' ? renderCalendarView() : (!S.rekapData.length ? `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada data rekap untuk periode ini</div><div class="text-xs text-gray-400 mt-1">Coba ubah tanggal mulai atau akhir</div></div>` : `
       <div class="md:hidden space-y-1 mt-3">
         ${S.rekapData.map(r=>`<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
           <div class="font-bold text-xs text-gray-800 dark:text-gray-200 mb-1">${esc(r.name)}</div>
@@ -736,7 +731,11 @@ function viewRekap() {
     </div>
     <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
       ${S.rekapTab==='kehadiran'?`
-        <div class="flex gap-2 mb-2"><select onchange="S.rekapBulan=parseInt(this.value);if(S.rekapView==='kalender')loadCalendar()" class="flex-1 border rounded p-2 text-sm font-bold dark:bg-gray-700 dark:border-gray-600">${bOpts}</select><input type="number" oninput="S.rekapTahun=parseInt(this.value)" value="${S.rekapTahun}" class="w-20 border rounded p-2 text-sm font-bold dark:bg-gray-700 dark:border-gray-600"><button onclick="S.rekapView==='kalender'?loadCalendar():loadRekap()" class="bg-blue-500 text-white px-3 rounded text-sm font-bold">Cari</button></div>
+        <div class="flex flex-col sm:flex-row gap-2 mb-3">
+          <div class="flex items-center gap-1 flex-1"><span class="text-xs font-bold">Dari:</span><input type="date" value="${S.rekapStart}" onchange="S.rekapStart=this.value" class="flex-1 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600"></div>
+          <div class="flex items-center gap-1 flex-1"><span class="text-xs font-bold">Ke:</span><input type="date" value="${S.rekapEnd}" onchange="S.rekapEnd=this.value" class="flex-1 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600"></div>
+          <button onclick="S.rekapView==='kalender'?loadCalendar():loadRekap()" class="bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold">Cari</button>
+        </div>
       `:`
         <div class="flex gap-2 mb-2"><button onclick="loadRekapSetoran()" class="w-full bg-blue-500 text-white py-2 rounded text-sm font-bold">Muat Semua Setoran</button></div>
       `}
