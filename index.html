@@ -108,7 +108,7 @@ const S = {
   absenTanggal: new Date().toISOString().slice(0,10), absenData: {},
   poinTab: 'aturan', selectedStudents: [], selectedRules: {}, customAmount: '', customNote: '',
   setoranData: { studentIds: [], tipe: 'Bacaan', subTipe: 'Iqra Hitam', jilid: '1', halaman: '', juz: '30', surah: '', ayatStart: '', ayatEnd: '', detailManual: '', status: 'Lancar', catatan: '' },
-  rekapTab: 'kehadiran', rekapBulan: new Date().getMonth()+1, rekapTahun: new Date().getFullYear(), rekapData: [], rekapSetoranData: [], rekapTanggal: new Date().toISOString().slice(0,10),
+  rekapTab: 'kehadiran', rekapView: 'tabel', rekapBulan: new Date().getMonth()+1, rekapTahun: new Date().getFullYear(), rekapData: [], rekapCalendar: {}, rekapSetoranData: [], rekapTanggal: new Date().toISOString().slice(0,10),
   raporStudent: '', raporStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10), raporEnd: new Date().toISOString().slice(0,10), raporData: null,
   editingSantri: null, newAturan: { name: '', points: 1 },
   submitting: false,
@@ -162,6 +162,12 @@ async function loadDashboard() {
 }
 async function loadAbsensi() { try { const r = await api('getAttendanceByDate', S.absenTanggal); S.absenData={}; S.students.forEach(s=>S.absenData[s.id]={status:'Hadir',keterangan:''}); r.forEach(x=>S.absenData[x.studentId]={status:x.status,keterangan:x.keterangan}); } catch(e){} }
 async function loadRekap() { S.loading=true; render(); try { S.rekapData = await api('getRekapKehadiran', S.rekapBulan, S.rekapTahun, S.filterKelas); } catch(e){} S.loading=false; render(); }
+async function loadCalendar() { 
+  if(S.rekapView !== 'kalender') return;
+  S.loading=true; render(); 
+  try { S.rekapCalendar = await api('getCalendarData', S.rekapBulan, S.rekapTahun); } catch(e){} 
+  S.loading=false; render(); 
+}
 async function loadRekapSetoran() { S.loading=true; render(); try { S.rekapSetoranData = await api('getRekapSetoran', null); } catch(e){} S.loading=false; render(); }
 async function loadRapor() { if(!S.raporStudent) return showToast('Pilih santri','warn'); S.loading=true; render(); try { S.raporData = await api('getRaporSantri', S.raporStudent, S.raporStart, S.raporEnd); } catch(e){} S.loading=false; render(); }
 
@@ -640,8 +646,48 @@ function viewSetoran(fS) {
 function viewRekap() {
   let bOpts = BULAN.map((b,i)=>`<option value="${i+1}" ${S.rekapBulan==i+1?'selected':''}>${b}</option>`).join('');
   let content = '';
+  const renderCalendarView = () => {
+    if(!S.rekapCalendar || Object.keys(S.rekapCalendar).length === 0) return '<div class="text-center py-4 text-gray-500">Belum ada data kehadiran bulan ini</div>';
+    const start = new Date(S.rekapTahun, S.rekapBulan-1, 1);
+    const end = new Date(S.rekapTahun, S.rekapBulan, 0);
+    let days = '';
+    let curr = new Date(start);
+    const firstDay = start.getDay();
+    for(let i=0; i<firstDay; i++) days += `<div></div>`;
+    while(curr <= end) {
+      const k = curr.toISOString().slice(0,10);
+      const d = S.rekapCalendar[k] || {hadir:0, sakit:0, izin:0, alfa:0};
+      const total = d.hadir + d.sakit + d.izin + d.alfa;
+      let bg = 'bg-gray-100 dark:bg-gray-700 text-gray-400';
+      let title = `Tidak ada data`;
+      if (total > 0) {
+        if (d.hadir >= total/2) { bg = 'bg-green-500 text-white'; title = `Hadir: ${d.hadir}, Total: ${total}`; }
+        else if (d.alfa >= total/2) { bg = 'bg-red-500 text-white'; title = `Alfa: ${d.alfa}, Total: ${total}`; }
+        else { bg = 'bg-amber-500 text-white'; title = `Hadir: ${d.hadir}, Sakit: ${d.sakit}, Izin: ${d.izin}, Alfa: ${d.alfa}`; }
+      }
+      days += `<div class="text-center p-1 rounded ${bg} text-[10px] font-bold cursor-pointer hover:opacity-80" title="${title}">${curr.getDate()}</div>`;
+      curr.setDate(curr.getDate() + 1);
+    }
+    return `
+      <div class="grid grid-cols-7 gap-1 mb-2 text-center text-[10px] font-bold text-gray-500">
+        <div>S</div><div>S</div><div>R</div><div>K</div><div>J</div><div>S</div><div>M</div>
+      </div>
+      <div class="grid grid-cols-7 gap-1">${days}</div>
+      <div class="flex gap-2 text-[10px] mt-2 justify-center flex-wrap">
+        <span><span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span> Mayoritas Hadir</span>
+        <span><span class="inline-block w-3 h-3 bg-amber-500 rounded-full"></span> Campuran</span>
+        <span><span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> Mayoritas Alfa</span>
+      </div>
+    `;
+  };
+
   if(S.rekapTab==='kehadiran') {
-    content = !S.rekapData.length ? `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada data rekap untuk periode ini</div><div class="text-xs text-gray-400 mt-1">Coba ubah bulan atau tahun</div></div>` : `
+    content = `
+      <div class="flex gap-2 mb-2 mt-2">
+        <button onclick="S.rekapView='tabel';render()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapView==='tabel'?'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}">Tabel</button>
+        <button onclick="S.rekapView='kalender';loadCalendar()" class="flex-1 py-1 text-xs font-bold rounded-lg ${S.rekapView==='kalender'?'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}">Kalender</button>
+      </div>
+      ${S.rekapView === 'kalender' ? renderCalendarView() : (!S.rekapData.length ? `<div class="text-center py-10"><div class="text-4xl mb-2">📭</div><div class="text-sm text-gray-500">Belum ada data rekap untuk periode ini</div><div class="text-xs text-gray-400 mt-1">Coba ubah bulan atau tahun</div></div>` : `
       <div class="md:hidden space-y-1 mt-3">
         ${S.rekapData.map(r=>`<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
           <div class="font-bold text-xs text-gray-800 dark:text-gray-200 mb-1">${esc(r.name)}</div>
@@ -655,7 +701,7 @@ function viewRekap() {
       </div>
       <table class="hidden md:table w-full text-left text-sm mt-3"><thead><tr class="bg-gray-50 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-300"><th class="p-2">Nama</th><th class="p-2 text-center text-green-600">H</th><th class="p-2 text-center text-amber-600">S</th><th class="p-2 text-center text-blue-600">I</th><th class="p-2 text-center text-red-600">A</th></tr></thead><tbody>
       ${S.rekapData.map(r=>`<tr class="border-b dark:border-gray-700"><td class="p-2 font-bold text-xs">${esc(r.name)}</td><td class="p-2 text-center font-bold">${r.hadir}</td><td class="p-2 text-center font-bold">${r.sakit}</td><td class="p-2 text-center font-bold">${r.izin}</td><td class="p-2 text-center font-bold">${r.alfa}</td></tr>`).join('')}
-    </tbody></table>`;
+    </tbody></table>`) }
   } else {
     const groups = {};
     S.rekapSetoranData.forEach(r=>{
@@ -690,7 +736,7 @@ function viewRekap() {
     </div>
     <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
       ${S.rekapTab==='kehadiran'?`
-        <div class="flex gap-2 mb-2"><select onchange="S.rekapBulan=parseInt(this.value)" class="flex-1 border rounded p-2 text-sm font-bold dark:bg-gray-700 dark:border-gray-600">${bOpts}</select><input type="number" oninput="S.rekapTahun=parseInt(this.value)" value="${S.rekapTahun}" class="w-20 border rounded p-2 text-sm font-bold dark:bg-gray-700 dark:border-gray-600"><button onclick="loadRekap()" class="bg-blue-500 text-white px-3 rounded text-sm font-bold">Cari</button></div>
+        <div class="flex gap-2 mb-2"><select onchange="S.rekapBulan=parseInt(this.value);if(S.rekapView==='kalender')loadCalendar()" class="flex-1 border rounded p-2 text-sm font-bold dark:bg-gray-700 dark:border-gray-600">${bOpts}</select><input type="number" oninput="S.rekapTahun=parseInt(this.value)" value="${S.rekapTahun}" class="w-20 border rounded p-2 text-sm font-bold dark:bg-gray-700 dark:border-gray-600"><button onclick="S.rekapView==='kalender'?loadCalendar():loadRekap()" class="bg-blue-500 text-white px-3 rounded text-sm font-bold">Cari</button></div>
       `:`
         <div class="flex gap-2 mb-2"><button onclick="loadRekapSetoran()" class="w-full bg-blue-500 text-white py-2 rounded text-sm font-bold">Muat Semua Setoran</button></div>
       `}
@@ -801,7 +847,13 @@ function viewRapor() {
   </div>
   <button onclick="loadRapor()" class="w-full bg-blue-500 text-white font-bold py-2 rounded">Tampilkan</button></div>${h}`;
 }
-async function shareWA() { try { const r = await api('generateRaporText', S.raporStudent, S.raporStart, S.raporEnd); window.open('https://wa.me/?text='+encodeURIComponent(r.text), '_blank'); } catch(e){ showToast(e.message,'error'); } }
+async function shareWA() { 
+  if(!S.raporStudent) return showToast('Pilih santri terlebih dahulu','warn');
+  try { 
+    const r = await api('generateRaporText', S.raporStudent, S.raporStart, S.raporEnd); 
+    window.open('https://wa.me/?text='+encodeURIComponent(r.text), '_blank'); 
+  } catch(e){ showToast(e.message,'error'); } 
+}
 
 function viewSantri() {
   const fS = getFilteredStudents();
@@ -812,8 +864,29 @@ function viewSantri() {
 async function saveSantri() { const p = S.editingSantri; try { if(p.id) await api('updateSantri', p.id, p); else await api('addSantri', p); S.editingSantri=null; await loadData(); showToast('Tersimpan','success'); } catch(e){ showToast(e.message,'error'); } render(); }
 
 function viewPengaturan() {
-  let rules = S.rules.map(r=>`<div class="flex justify-between items-center p-2 border-b dark:border-gray-700"><div class="text-xs font-bold text-gray-700 dark:text-gray-300">${esc(r.name)}</div><div class="flex items-center gap-2"><span class="text-xs font-black ${r.points>0?'text-green-600':'text-red-600'}">${r.points>0?'+':''}${r.points}</span><button onclick="if(confirm('Hapus?'))api('deleteAturan',${r.id}).then(()=>loadData()).then(render)" class="text-red-500 text-xs font-bold bg-red-50 dark:bg-red-900/30 px-2 rounded">X</button></div></div>`).join('');
-  return `<div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-3"><h2 class="font-bold mb-2 text-sm dark:text-white">Atur Poin Aktivitas</h2><form onsubmit="event.preventDefault();saveAturan()" class="flex gap-1 mb-2"><input type="text" required oninput="S.newAturan.name=this.value" placeholder="Nama" class="flex-1 border rounded p-1 text-xs dark:bg-gray-700 dark:border-gray-600"><input type="number" required oninput="S.newAturan.points=this.value" placeholder="Poin" class="w-16 border rounded p-1 text-xs dark:bg-gray-700 dark:border-gray-600"><button type="submit" class="bg-blue-500 text-white px-2 rounded text-xs font-bold">+</button></form><div class="max-h-[50vh] overflow-y-auto">${rules}</div></div>`;
+  const renderRule = (r) => `<div class="flex justify-between items-center p-2 border-b dark:border-gray-700"><div class="text-xs font-bold text-gray-700 dark:text-gray-300">${esc(r.name)}</div><div class="flex items-center gap-2"><span class="text-xs font-black ${r.points>0?'text-green-600':'text-red-600'}">${r.points>0?'+':''}${r.points}</span><button onclick="if(confirm('Hapus?'))api('deleteAturan',${r.id}).then(()=>loadData()).then(render)" class="text-red-500 text-xs font-bold bg-red-50 dark:bg-red-900/30 px-2 rounded">X</button></div></div>`;
+  
+  const posRules = S.rules.filter(r => r.points > 0).sort((a,b) => b.points - a.points).map(renderRule).join('');
+  const negRules = S.rules.filter(r => r.points < 0).sort((a,b) => a.points - b.points).map(renderRule).join('');
+  
+  return `<div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-3">
+    <h2 class="font-bold mb-2 text-sm dark:text-white">Atur Poin Aktivitas</h2>
+    <form onsubmit="event.preventDefault();saveAturan()" class="flex gap-1 mb-2">
+      <input type="text" required oninput="S.newAturan.name=this.value" placeholder="Nama" class="flex-1 border rounded p-1 text-xs dark:bg-gray-700 dark:border-gray-600">
+      <input type="number" required oninput="S.newAturan.points=this.value" placeholder="Poin" class="w-16 border rounded p-1 text-xs dark:bg-gray-700 dark:border-gray-600">
+      <button type="submit" class="bg-blue-500 text-white px-2 rounded text-xs font-bold">+</button>
+    </form>
+    <div class="max-h-[50vh] overflow-y-auto">
+      <div class="mb-2">
+        <div class="text-[10px] font-bold text-green-600 mb-1 uppercase tracking-wide">Penambahan (+)</div>
+        ${posRules || '<div class="text-xs text-gray-400 italic p-2">Belum ada aturan positif</div>'}
+      </div>
+      <div>
+        <div class="text-[10px] font-bold text-red-600 mb-1 uppercase tracking-wide">Pengurangan (-)</div>
+        ${negRules || '<div class="text-xs text-gray-400 italic p-2">Belum ada aturan negatif</div>'}
+      </div>
+    </div>
+  </div>`;
 }
 async function saveAturan() { try { await api('addAturan', S.newAturan); S.newAturan={name:'',points:1}; await loadData(); showToast('Tersimpan','success'); } catch(e){ showToast(e.message,'error'); } render(); }
 
